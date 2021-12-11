@@ -21,7 +21,7 @@ $(BINDIR)/server: $(OBJDIR)/server.o
 $(BINDIR)/client: $(OBJDIR)/client.o
 	$(CXX) $^ -o $@
 
-$(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Room.o
+$(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Game.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 $(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp

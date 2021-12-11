@@ -1,5 +1,0 @@
-make --dry-run --keep-going --print-directory
-make: Entering directory '/home/seadragnol/code/HUST/lap_trinh_mang/SFML'
-g++ obj/client.o -o bin/client
-make: Leaving directory '/home/seadragnol/code/HUST/lap_trinh_mang/SFML'
- 
