@@ -1,6 +1,4 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-makefile:13: *** missing separator.  Stop.
- 
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -8,13 +6,13 @@ makefile:13: *** missing separator.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Dec 11 11:03:57 2021
+# Make data base, printed on Sat Dec 11 14:15:53 2021
 
 # Variables
 
 # environment
 VSCODE_GIT_ASKPASS_MAIN = /usr/share/code/resources/app/extensions/git/dist/askpass-main.js
-# environment
+# 'override' directive
 GNUMAKEFLAGS := 
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
@@ -30,10 +28,14 @@ XDG_SESSION_CLASS = user
 XDG_SESSION_TYPE = x11
 # environment
 VSCODE_LOG_NATIVE = false
+# makefile (from 'makefile', line 1)
+TARGET = final
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # environment
 IM_CONFIG_PHASE = 1
+# makefile (from 'makefile', line 12)
+INCLUDES := include/Room.h
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
 # environment
@@ -52,6 +54,8 @@ VTE_VERSION = 6003
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
 _ = /usr/bin/code
+# makefile (from 'makefile', line 14)
+rm = rm -f
 # environment
 JOURNAL_STREAM = 8:53676
 # environment
@@ -64,6 +68,8 @@ MAKEFILE_LIST :=  makefile
 GIO_LAUNCHED_DESKTOP_FILE = /usr/share/applications/code.desktop
 # environment
 USERNAME = seadragnol
+# makefile (from 'makefile', line 11)
+SOURCES := src/server.cpp src/sfml.cpp src/client.cpp src/Room.cpp
 # environment
 MAKELEVEL := 0
 # environment
@@ -108,6 +114,8 @@ VSCODE_LOG_STACK = false
 VSCODE_CRASH_REPORTER_START_OPTIONS = {"companyName":"Microsoft","productName":"VSCode","submitURL":"appcenter://code?aid=fba07a4d-84bd-4fc8-a125-9640fc8ce171&uid=f8b3464f-fcc8-4311-8059-7d6d7d606509&iid=f8b3464f-fcc8-4311-8059-7d6d7d606509&sid=f8b3464f-fcc8-4311-8059-7d6d7d606509","uploadToServer":true}
 # environment
 INVOCATION_ID = edf8e0df072a4dbc9363ad180a7860e6
+# makefile (from 'makefile', line 4)
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -126,6 +134,8 @@ GIO_LAUNCHED_DESKTOP_FILE_PID = 2712
 DISPLAY = :0
 # environment
 CONDA_EXE = /home/seadragnol/anaconda3/bin/conda
+# makefile (from 'makefile', line 6)
+SRCDIR = src
 # environment
 VSCODE_PIPE_LOGGING = true
 # environment
@@ -178,6 +188,8 @@ MAKECMDGOALS := all
 QT_IM_MODULE = ibus
 # environment
 SHLVL = 2
+# makefile (from 'makefile', line 9)
+BINDIR = bin
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # default
@@ -187,13 +199,15 @@ USER = seadragnol
 # environment
 LC_MONETARY = vi_VN
 # makefile
-.DEFAULT_GOAL := sfml-app
+.DEFAULT_GOAL := all
 # environment
 XDG_CURRENT_DESKTOP = Unity
 # environment
 LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
+# makefile (from 'makefile', line 8)
+LIBDIR = include
 # environment
 LC_TELEPHONE = vi_VN
 # environment
@@ -246,6 +260,10 @@ LC_NUMERIC = vi_VN
 <F = $(notdir $<)
 # environment
 ELECTRON_RUN_AS_NODE = 1
+# makefile (from 'makefile', line 7)
+OBJDIR = obj
+# makefile (from 'makefile', line 3)
+CXX = g++
 # environment
 LC_MEASUREMENT = vi_VN
 # environment
@@ -278,6 +296,8 @@ WINDOWPATH = 2
 LC_IDENTIFICATION = vi_VN
 # default
 .RECIPEPREFIX := 
+# makefile (from 'makefile', line 13)
+OBJECTS := obj/server.o obj/sfml.o obj/client.o obj/Room.o
 # environment
 LC_ADDRESS = vi_VN
 # environment
@@ -285,14 +305,13 @@ LANG = C
 # environment
 TERM = screen-256color
 # environment
- 
 _P9K_TTY = /dev/pts/0
 # environment
 VSCODE_PID = 4440
 # environment
 _CE_CONDA = 
 # variable set hash-table stats:
-# Load=139/1024=14%, Rehash=0, Collisions=22/153=14%
+# Load=150/1024=15%, Rehash=0, Collisions=34/197=17%
 
 # Pattern-specific Variable Values
 
@@ -300,9 +319,12 @@ _CE_CONDA =
 
 # Directories
 
-# . (device 66310, inode 2235500): 10 files, no impossibilities.
+# include (device 66310, inode 2236487): 3 files, no impossibilities.
+ 
+# . (device 66310, inode 2235500): 11 files, no impossibilities.
+# src (device 66310, inode 2236398): 6 files, no impossibilities.
 
-# 10 files, no impossibilities in 1 directories.
+# 20 files, no impossibilities in 3 directories.
 
 # Implicit Rules
 
@@ -310,31 +332,97 @@ _CE_CONDA =
 
 # Files
 
-# Not a target:
-all:
+obj/sfml.o: src/sfml.cpp
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: 'sfml'
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 28):
+	$(CXX) -c $< -o $@
+
+obj/server.o: src/server.cpp
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: 'server'
+#  Last modified 2021-12-11 13:45:57.521596152
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 28):
+	$(CXX) -c $< -o $@
+
+all: bin/server bin/client bin/sfml
 #  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/4=0%
+
+# Not a target:
+src/Room.cpp:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 
 # Not a target:
 makefile:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-11 14:15:21.231596151
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/client.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-09 23:35:22.793
+#  File has been updated.
+#  Successfully updated.
+
+bin/client: obj/client.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := bin/client
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := obj/client.o
+# automatic
+# | := 
+# automatic
+# < := obj/client.o
+# automatic
+# ^ := obj/client.o
+# automatic
+# ? := obj/client.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/14=7%
+#  recipe to execute (from 'makefile', line 22):
+	$(CXX) $^ -o $@
+
+# Not a target:
+src/sfml.cpp:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 
 # Not a target:
-main.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-sfml-app: main.o
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'makefile', line 4):
-	g++ main.o -o sfml-app -lsfml-graphics -lsfml-window -lsfml-system
+src/server.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2021-12-11 13:40:08.996603752
+#  File has been updated.
+#  Successfully updated.
 
 # Not a target:
 .DEFAULT:
@@ -342,47 +430,52 @@ sfml-app: main.o
 #  Modification time never checked.
 #  File has not been updated.
 
-# Not a target:
-client.cpp:
+bin/sfml: obj/sfml.o obj/Room.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+#  recipe to execute (from 'makefile', line 25):
+	$(CXX) $^ $(LDFLAGS) -o $@
 
-main: server.cpp client.cpp
+bin/server: obj/server.o
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'makefile', line 10):
-	g++ -o server src/server.cpp
-	g++ -o client src
+#  Last modified 2021-12-11 13:45:57.55759622
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 19):
+	$(CXX) $^ -o $@
 
-main.o: main.cpp
+obj/Room.o: src/Room.cpp
 #  Implicit rule search has not been done.
+#  Implicit/static pattern stem: 'Room'
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 7):
-	g++ -c main.cpp
+#  recipe to execute (from 'makefile', line 28):
+	$(CXX) -c $< -o $@
 
-# Not a target:
-server.cpp:
+obj/client.o: src/client.cpp
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit/static pattern stem: 'client'
+#  Last modified 2021-12-11 13:36:40.947558881
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 28):
+	$(CXX) -c $< -o $@
 
 # files hash-table stats:
-# Load=10/1024=1%, Rehash=0, Collisions=0/16=0%
+# Load=15/1024=1%, Rehash=0, Collisions=0/45=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 19 / storage = 153 B / avg = 8 B
-# current buf: size = 8162 B / used = 153 B / count = 19 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 38 / storage = 337 B / avg = 8 B
+# current buf: size = 8162 B / used = 337 B / count = 38 / avg = 8 B
 
-# strcache performance: lookups = 29 / hit rate = 34%
+# strcache performance: lookups = 65 / hit rate = 41%
 # hash-table stats:
-# Load=19/8192=0%, Rehash=0, Collisions=1/29=3%
-# Finished Make data base on Sat Dec 11 11:03:57 2021
+# Load=38/8192=0%, Rehash=0, Collisions=3/65=5%
+# Finished Make data base on Sat Dec 11 14:15:53 2021
 
  

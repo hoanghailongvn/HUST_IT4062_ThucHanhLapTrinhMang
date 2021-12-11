@@ -1,30 +1,28 @@
-# TARGET = projectname
+TARGET = final
 
-# CXX = g++
+CXX = g++
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
-# SRCDIR = src
-# OBJDIR = obj
-# LIBDIR = include
-# BINDIR = bin
+SRCDIR = src
+OBJDIR = obj
+LIBDIR = include
+BINDIR = bin
 
-# SOURCES := $(wildcard $(SRCDIR/*.cpp))
-# INCLUDES := $(wildcard $(LIBDIR/*.h))
-# OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-# rm = rm -f
+SOURCES := $(wildcard $(SRCDIR)/*.cpp)
+INCLUDES := $(wildcard $(LIBDIR)/*.h)
+OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+rm = rm -f
 
-# $(BINDIR)/$(TARGET): $(OBJECTS)
+all: $(BINDIR)/server $(BINDIR)/client $(BINDIR)/sfml
 
+$(BINDIR)/server: $(OBJDIR)/server.o
+	$(CXX) $^ -o $@
 
-# sfml-app: main.o
-# 	g++ main.o -o sfml-app -lsfml-graphics -lsfml-window -lsfml-system
+$(BINDIR)/client: $(OBJDIR)/client.o
+	$(CXX) $^ -o $@
 
-# main.o: main.cpp
-# 	g++ -c main.cpp
+$(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Room.o
+	$(CXX) $^ $(LDFLAGS) -o $@
 
-# main: server.cpp client.cpp
-# 	g++ -o server src/server.cpp
-# 	g++ -o client src
-
-# clean rm -f *.o *~
-
-test.o: test.cpp
+$(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) -c $< -o $@

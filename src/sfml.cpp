@@ -6,10 +6,17 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
 
+#include "../include/Room.h"
+
+using namespace std;
+
 int main()
 {
+    Room test_room(2);
+    cout << test_room.x << endl;
+
     //Window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "My first game", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(1800, 600), "My first game", sf::Style::Titlebar | sf::Style::Close);
     sf::Event ev;
 
     //Game loop
