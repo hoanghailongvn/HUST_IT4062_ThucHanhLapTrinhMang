@@ -13,6 +13,7 @@
 class IntroWindow {
 private:
     Button *register_btn, *login_btn;
+    sf::Text *main;
 public:
     IntroWindow(sf::Font *font);
     ~IntroWindow();
