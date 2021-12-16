@@ -19,3 +19,11 @@ void IntroWindow::drawTo(sf::RenderTarget &target) {
     this->register_btn->drawTo(target);
     this->login_btn->drawTo(target);
 }
+
+bool IntroWindow::registerPressed() {
+    return this->register_btn->isPressed();
+}
+
+bool IntroWindow::loginPressed() {
+    return this->login_btn->isPressed();
+}

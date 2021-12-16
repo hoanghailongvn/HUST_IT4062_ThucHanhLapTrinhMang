@@ -4,7 +4,13 @@
 #define screenWidth 1000
 #define screenHeight 600
 #define titleGame "Words War"
+#define usernameMaxLength 30
+#define passwordMaxLength 30
 #define fontArcadePath "/home/seadragnol/code/HUST/lap_trinh_mang/SFML/fonts/ARCADECLASSIC.TTF"
+#define fontPriceDownPath "/home/seadragnol/code/HUST/lap_trinh_mang/SFML/fonts/pricedown.otf"
+#define fontUpheavttPath "/home/seadragnol/code/HUST/lap_trinh_mang/SFML/fonts/upheavtt.ttf"
+#define fontPerfectDosPath "/home/seadragnol/code/HUST/lap_trinh_mang/SFML/fonts/Perfect DOS VGA 437.ttf"
+
 
 #endif
 

@@ -5,6 +5,7 @@
 #include "GameConfig.h"
 #include "../include/Button.h"
 #include "../include/IntroWindow.h"
+#include "../include/RegisterWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -33,14 +34,16 @@ private:
     sf::Vector2i mousePosWindow;
     sf::Vector2f mousePosView;
 
-    sf::Font *fontArcade;
+    sf::Font *font;
 
     // windows
     IntroWindow *introWindow;
+    RegisterWindow *registerWindow;
 
     void initVariables();
     void initWindow();
     void initIntroWindow();
+    void initRegisterWindow();
     void initFont();
 
 public:

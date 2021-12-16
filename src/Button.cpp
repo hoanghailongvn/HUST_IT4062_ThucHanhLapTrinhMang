@@ -20,7 +20,6 @@ Button::Button(float x, float y, float width, float height,
         this->shape.getPosition().x + this->shape.getGlobalBounds().width / 2.f,
         this->shape.getPosition().y + this->shape.getGlobalBounds().height / 2.f
         );
-    std::cout << this->text.getGlobalBounds().width;
 
     this->idleColor = idleColor;
     this->hoverColor = hoverColor;

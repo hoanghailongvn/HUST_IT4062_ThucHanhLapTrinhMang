@@ -15,12 +15,17 @@ void Window::initWindow()
 }
 
 void Window::initIntroWindow() {
-    this->introWindow = new IntroWindow(this->fontArcade);
+    this->introWindow = new IntroWindow(this->font);
+}
+
+
+void Window::initRegisterWindow() {
+    this->registerWindow = new RegisterWindow(this->font);
 }
 
 void Window::initFont() {
-    this->fontArcade = new sf::Font();
-    this->fontArcade->loadFromFile(fontArcadePath);
+    this->font = new sf::Font();
+    this->font->loadFromFile(fontPerfectDosPath);
 }
 
 Window::Window() {
@@ -28,12 +33,14 @@ Window::Window() {
     this->initVariables();
     this->initWindow();
     this->initIntroWindow();
+    this->initRegisterWindow();
 }
 
 Window::~Window() {
     delete this->window;
     delete this->introWindow;
-    delete this->fontArcade;
+    delete this->registerWindow;
+    delete this->font;
 }
 
 const bool Window::running() const
@@ -49,6 +56,16 @@ void Window::pollEvents()
         case sf::Event::Closed:
             this->window->close();
             break;
+        case sf::Event::TextEntered:
+            switch (this->state)
+            {
+            case REGISTER:
+                this->registerWindow->typedOn(ev);
+                break;
+            
+            default:
+                break;
+            }
         default:
             break;
         }
@@ -71,7 +88,22 @@ void Window::update()
     {
     case INTRO:
         this->introWindow->update(this->mousePosView);
+        if(introWindow->registerPressed()) {
+            this->state = REGISTER;
+            this->registerWindow->refresh();
+        } 
+        if(introWindow->loginPressed()) {
+            this->state = LOGIN;
+        }
         break;
+    case REGISTER:
+        this->registerWindow->update(this->mousePosView);
+        if(registerWindow->backPressed()) {
+            this->state = INTRO;
+        }
+        if(registerWindow->submitPressed()) {
+            std::cout << "Press submit" << "\n";
+        }
     
     default:
         break;
@@ -89,6 +121,9 @@ void Window::render()
         this->introWindow->drawTo(*this->window);
         break;
     
+    case REGISTER:
+        this->registerWindow->drawTo(*this->window);
+        break;
     default:
         break;
     }

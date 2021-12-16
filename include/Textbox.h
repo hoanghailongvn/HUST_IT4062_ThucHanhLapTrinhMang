@@ -4,36 +4,34 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <sstream>
+#include <string>
 
 #define DELETE_KEY 8
 #define ENTER_KEY 13
 #define ESCAPE_KEY 27
 
 class Textbox {
-public:
-    Textbox();
-    ~Textbox();
-
-    Textbox(int size, sf::Color color, bool sel);
-
-    void setFont(sf::Font& font);
-    void setPosition(sf::Vector2f pos);
-    void setLimit(bool ToF);
-    void setLimit(bool ToF, int lim);
-    void setSelected(bool sel);
-    std::string getText();
-    void drawTo(sf::RenderWindow &window);
-    void typedOn(sf::Event input);
-
 private:
     sf::Text textbox;
     std::ostringstream text;
+    std::string textbase;
     bool isSelected;
-    bool hasLimit;
     int limit;
 
     void inputLogic(int charTyped);
     void deleteLastChar();
+
+public:
+    Textbox(float x, float y, sf::Font *font, std::string textbase, int size, sf::Color color, bool sel, int limit);
+    ~Textbox();
+
+    void setSelected(bool sel);
+    std::string getText();
+    void drawTo(sf::RenderTarget &window);
+    void typedOn(sf::Event ev);
+    bool isPressed(sf::Vector2f mousePos);
+    void refresh();
+
 };
 
 #endif
