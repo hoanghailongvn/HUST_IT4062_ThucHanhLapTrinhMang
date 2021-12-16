@@ -18,9 +18,12 @@ void Window::initIntroWindow() {
     this->introWindow = new IntroWindow(this->font);
 }
 
-
 void Window::initRegisterWindow() {
     this->registerWindow = new RegisterWindow(this->font);
+}
+
+void Window::initLoginWindow() {
+    this->loginWindow = new LoginWindow(this->font);
 }
 
 void Window::initFont() {
@@ -34,6 +37,7 @@ Window::Window() {
     this->initWindow();
     this->initIntroWindow();
     this->initRegisterWindow();
+    this->initLoginWindow();
 }
 
 Window::~Window() {
@@ -63,6 +67,9 @@ void Window::pollEvents()
                 this->registerWindow->typedOn(ev);
                 break;
             
+            case LOGIN:
+                this->loginWindow->typedOn(ev);
+                break;
             default:
                 break;
             }
@@ -94,6 +101,7 @@ void Window::update()
         } 
         if(introWindow->loginPressed()) {
             this->state = LOGIN;
+            this->loginWindow->refresh();
         }
         break;
     case REGISTER:
@@ -104,7 +112,16 @@ void Window::update()
         if(registerWindow->submitPressed()) {
             std::cout << "Press submit" << "\n";
         }
-    
+        break;
+    case LOGIN:
+        this->loginWindow->update(this->mousePosView);
+        if(loginWindow->backPressed()) {
+            this->state = INTRO;
+        }
+        if(loginWindow->submitPressed()) {
+            std::cout << "Press submit" << "\n";
+        }
+        break;
     default:
         break;
     }
@@ -123,6 +140,10 @@ void Window::render()
     
     case REGISTER:
         this->registerWindow->drawTo(*this->window);
+        break;
+
+    case LOGIN:
+        this->loginWindow->drawTo(*this->window);
         break;
     default:
         break;

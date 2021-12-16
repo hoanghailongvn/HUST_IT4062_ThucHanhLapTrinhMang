@@ -21,7 +21,7 @@ $(BINDIR)/server: $(OBJDIR)/server.o
 $(BINDIR)/client: $(OBJDIR)/client.o
 	$(CXX) $^ -o $@
 
-$(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Window.o $(OBJDIR)/Textbox.o $(OBJDIR)/Button.o $(OBJDIR)/IntroWindow.o $(OBJDIR)/RegisterWindow.o
+$(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Window.o $(OBJDIR)/Textbox.o $(OBJDIR)/Button.o $(OBJDIR)/IntroWindow.o $(OBJDIR)/RegisterWindow.o $(OBJDIR)/LoginWindow.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 $(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp

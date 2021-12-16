@@ -1,5 +1,5 @@
-#ifndef REGISTERWINDOW_H
-#define REGISTERWINDOW_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include <iostream>
 #include <sstream>
@@ -11,21 +11,21 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-struct RegisterForm {
+struct LoginForm {
     char username[usernameMaxLength + 1];
     char password_1[passwordMaxLength + 1];
     char password_2[passwordMaxLength + 1];
 };
 
-class RegisterWindow {
+class LoginWindow {
     private:
     Button *submit_btn, *back_btn;
-    Textbox *username, *password_1, *password_2;
+    Textbox *username, *password;
     std::list<Textbox *> listTextbox;
     sf::Text *main;
 public:
-    RegisterWindow(sf::Font *font);
-    ~RegisterWindow();
+    LoginWindow(sf::Font *font);
+    ~LoginWindow();
 
     void refresh();
 

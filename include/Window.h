@@ -6,6 +6,7 @@
 #include "../include/Button.h"
 #include "../include/IntroWindow.h"
 #include "../include/RegisterWindow.h"
+#include "../include/LoginWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -39,11 +40,13 @@ private:
     // windows
     IntroWindow *introWindow;
     RegisterWindow *registerWindow;
+    LoginWindow *loginWindow;
 
     void initVariables();
     void initWindow();
     void initIntroWindow();
     void initRegisterWindow();
+    void initLoginWindow();
     void initFont();
 
 public:
