@@ -1,22 +1,20 @@
+#include "../include/Window.h"
+#include "../include/Textbox.h"
 #include <iostream>
-#include "../include/Game.h"
 
 using namespace std;
 
 int main()
 {
-    //Init game engine
-    Game game;
+    srand(static_cast<unsigned>(time(NULL)));
+    Window window;
 
-    //Game loop
-    while (game.running()) {
-        //update
-        game.update();
+    // Game loop
+    while (window.running()) {
+        window.update();
 
-        //render
-        game.render();
+        window.render();
     }
-
 
     return 0;
 }

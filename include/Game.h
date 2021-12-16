@@ -1,11 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <ctime>
+#include <iostream>
+#include <vector>
+
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
 
 /*
     Class that acts as the game engine.
@@ -14,22 +18,49 @@
 
 class Game {
 private:
+    //Variables
+    //Window
     sf::RenderWindow* window;
     sf::VideoMode videoMode;
     sf::Event ev;
 
+    // Mouse position
+    sf::Vector2i mousePosWindow;
+    sf::Vector2f mousePosView;
+
+    // Game logic
+    bool endGame;
+    unsigned points;
+    unsigned health;
+    float enemySpawnTimer;
+    float enemySpawnTimerMax;
+    int maxEnemies;
+    bool mouseHeld;
+
+    //Game objects
+    std::vector<sf::RectangleShape> enemies;
+    sf::RectangleShape enemy;
+
+    //Private functions
     void initVariables();
     void initWindow();
+    void initEnemies();
+
 public:
     Game();
     virtual ~Game();
 
-    //Accessors
+    // Accessors
     const bool running() const;
+    const bool getEndGame() const;
 
-    //Functions
+    // Functions
+    void spawnEnemy();
     void pollEvents();
+    void updateMousePositions();
     void update();
+    void updateEnemies();
+    void renderEnemies();
     void render();
 };
 
