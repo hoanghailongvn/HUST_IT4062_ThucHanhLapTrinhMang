@@ -1,0 +1,7 @@
+long 123456 0
+hieu 123 0
+soict soict123 1
+hust hust123 1
+hieuu 456 1
+tdhieu 135 1
+hieu 123456 0
