@@ -41,6 +41,10 @@ void Client::initLoginWindow()
     this->loginWindow = new LoginWindow(this->font);
 }
 
+void Client::initLobbyWindow() {
+    this->lobbyWindow = new LobbyWindow(this->font);
+}
+
 void Client::initNotification()
 {
     this->notification = new Notification(this->font);
@@ -63,6 +67,7 @@ Client::Client()
     this->initIntroWindow();
     this->initRegisterWindow();
     this->initLoginWindow();
+    this->initLobbyWindow();
     this->initNotification();
 }
 
@@ -122,14 +127,15 @@ void Client::pollEvents()
                     switch (fail_type) {
                     case 0:
                         this->sendToServer();
-                        this->rcv_rp_register();
+                        this->rcvFromServer();
+                        this->rp_register();
                         break;
                     case 1:
-                        this->notification->setText("Register Fail!!", 50, "Empty field", 20);
+                        this->notification->setText("Register Fail!!", 50, "Empty field", 30);
                         this->next_state = REGISTER;
                         break;
                     case 2:
-                        this->notification->setText("Register Fail!!", 50, "Password not match!!", 20);
+                        this->notification->setText("Register Fail!!", 50, "Password not match!!", 30);
                         this->next_state = REGISTER;
                         break;
                     default:
@@ -152,17 +158,35 @@ void Client::pollEvents()
                 if (loginWindow->backPressed()) {
                     this->state = INTRO;
                 }
-                if (loginWindow->submitPressed()) {
-                    std::cout << "Press submit"
-                            << "\n";
+                int fail_type;
+                if (loginWindow->submitPressed(this->buff, &fail_type)) {
+                    if(fail_type == 0) {
+                        this->sendToServer();
+                        this->rcvFromServer();
+                        this->rp_login();
+                    } else if (fail_type == 1) {
+                        this->notification->setText("Login Fail!!", 50, "Empty field.", 30);
+                        this->next_state = LOGIN;
+                    }
+                    this->state = NOTIFICATION;
                 }
+                break;
             default:
                 break;
             }
-
+            break;
         case NOTIFICATION:
             if (ev.type == sf::Event::MouseButtonPressed) {
                 this->state = this->next_state;
+            }
+            break;
+        case LOBBY:
+            if (ev.type == sf::Event::MouseButtonPressed) {
+                if (this->lobbyWindow->logoutPressed()) {
+                    //TODO
+                    this->next_state = INTRO;
+                    this->state = NOTIFICATION;
+                }
             }
         default:
             break;
@@ -192,6 +216,8 @@ void Client::update()
     case LOGIN:
         this->loginWindow->update(this->mousePosView);
         break;
+    case LOBBY:
+        this->lobbyWindow->update(this->mousePosView);
     default:
         break;
     }
@@ -219,6 +245,9 @@ void Client::render()
         this->notification->drawTo(*this->window);
         break;
 
+    case LOBBY:
+        this->lobbyWindow->drawTo(*this->window);
+        break;
     default:
         break;
     }
@@ -243,16 +272,18 @@ void Client::sendToServer()
         exit(1);
     }
 }
-
-void Client::rcv_rp_register()
-{
+void Client::rcvFromServer() {
     int ret;
     ret = recv(this->clientfd, this->buff, BUFF_SIZE, 0);
     if (ret < 0) {
         perror("Error: ");
         exit(1);
     }
+    this->buff[ret] = '\0';
+}
 
+void Client::rp_register()
+{
     struct rp_register rp = message_to_rp_register(this->buff);
     if (rp.accept) {
         this->notification->setText("Register Success!!", 50, "", 0);
@@ -261,6 +292,18 @@ void Client::rcv_rp_register()
         this->notification->setText("Register Fail!!", 50, rp.notification, 30);
         this->next_state = REGISTER;
     }
+}
+
+void Client::rp_login() {
+    struct rp_login rp = message_to_rp_login(this->buff);
+    if (rp.accept) {
+        this->notification->setText("Login Success!!", 50, "", 0);
+        this->next_state = LOBBY;
+    } else {
+        this->notification->setText("Login Fail!!", 50, rp.notification, 30);
+        this->next_state = LOGIN;
+    }
+
 }
 
 void Client::closeSocket()

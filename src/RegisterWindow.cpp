@@ -91,6 +91,7 @@ bool RegisterWindow::submitPressed(char *message, int *fail_type) {
         }
 
         rq_register rq;
+        rq.type = RQ_REGISTER;
         rq.username = s_username;
         rq.password = s_password_1;
         *fail_type = 0;

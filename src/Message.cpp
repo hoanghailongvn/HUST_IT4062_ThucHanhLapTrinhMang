@@ -60,6 +60,17 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
+    case RP_LOGIN:
+    {
+        auto *struct_obj = (rp_login *)p;
+        final << struct_obj->type << "\n";
+        final << struct_obj->accept << "\n";
+        final << struct_obj->notification << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     default:
         break;
     }
@@ -80,7 +91,11 @@ rp_register message_to_rp_register(char *message) {
     rp_register res;
     res.type = RP_REGISTER;
     res.accept = atoi(splited_line.at(1));
-    res.notification = splited_line.at(2);
+    if (!res.accept) {
+        res.notification = splited_line.at(2);
+    } else {
+        res.notification = "";
+    }
 
     return res;
 }
@@ -88,7 +103,6 @@ rp_register message_to_rp_register(char *message) {
 rq_login message_to_rq_login(char *message) {
     vector <char *> splited_line = split(message, "\n");
     rq_login res;
-    res.type = RQ_LOGIN;
     res.username = splited_line.at(1);
     res.password = splited_line.at(2);
 
@@ -98,9 +112,13 @@ rq_login message_to_rq_login(char *message) {
 rp_login message_to_rp_login(char *message) {
     vector <char *> splited_line = split(message, "\n");
     rp_login res;
-    res.type = RP_LOGIN;
     res.accept = atoi(splited_line.at(1));
-    res.notification = splited_line.at(2);
+    if (!res.accept) {
+        res.notification = splited_line.at(2);
+    } else {
+        res.notification = "";
+    }
+
 
     return res;
 }

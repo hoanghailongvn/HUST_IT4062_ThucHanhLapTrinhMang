@@ -17,6 +17,7 @@
 #include "../include/RegisterWindow.h"
 #include "../include/LoginWindow.h"
 #include "../include/Notification.h"
+#include "../include/LobbyWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -57,7 +58,9 @@ private:
     IntroWindow *introWindow;
     RegisterWindow *registerWindow;
     LoginWindow *loginWindow;
+    LobbyWindow *lobbyWindow;
     Notification *notification;
+
 
     void initNetwork();
     void initVariables();
@@ -65,6 +68,7 @@ private:
     void initIntroWindow();
     void initRegisterWindow();
     void initLoginWindow();
+    void initLobbyWindow();
     void initNotification();
     void initFont();
 
@@ -83,8 +87,10 @@ public:
     void communicate();
     void run();
     void sendToServer();
+    void rcvFromServer();
 
-    void rcv_rp_register();
+    void rp_register();
+    void rp_login();
 
     void closeSocket();
 };

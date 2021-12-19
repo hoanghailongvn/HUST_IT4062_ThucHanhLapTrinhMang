@@ -77,15 +77,13 @@ void Server::run()
                     break;
                 
                 case RQ_LOGIN:
-                    this->rq_login();
-
+                    this->rq_login(&clientAddr);
+                    this->sendToClient(connfd);
+                    break;
                 default:
                     break;
                 }
             }
-
-            
-
             close(connfd);
             exit(0);
         }
@@ -148,10 +146,42 @@ void Server::rq_register()
     struct_to_message(&rp, RP_REGISTER, this->buff);
 }
 
-void Server::rq_login() {
+void Server::rq_login(struct sockaddr_in *clientAddr) {
     struct rq_login rq = message_to_rq_login(this->buff);
     struct rp_login rp;
+
+    bool check = false;
+    User *target = nullptr;
+    for (auto user:this->listUser) {
+        if (user->getUsername().compare(rq.username) == 0) {
+            check = true;
+            target = user;
+            break;
+        }
+    }
+    if (!check) {
+        rp.accept = false;
+        rp.notification = "Username not exist.";
+    } else {
+        if (target->checkPassword(rq.password)) {
+            if (target->isOnline()) {
+                rp.accept = false;
+                rp.notification = "User online.";
+            } else {
+                rp.accept = true;
+                rp.notification = "";
+            }
+        } else {
+            rp.accept = false;
+            rp.notification = "Wrong password.";
+        }
+    }
     
+    if (rp.accept) {
+        target->setClientAddr(clientAddr);
+        target->setState(ONLINE);
+    }
+    struct_to_message(&rp, RP_LOGIN, this->buff);
 }
 
 
@@ -160,5 +190,5 @@ void Server::sendToClient(int connfd) {
     if(sendBytes < 0) {
         perror("Error");
     }
-    cout << "\nSend; \n" << this->buff << "\n";
+    cout << "\nSend: \n" << this->buff << "\n";
 }

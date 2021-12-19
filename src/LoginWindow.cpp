@@ -1,5 +1,7 @@
 #include "../include/LoginWindow.h"
 
+using namespace std;
+
 LoginWindow::LoginWindow(sf::Font *font) {
     this->main = new sf::Text();
     this->main->setString("Login");
@@ -60,8 +62,27 @@ void LoginWindow::drawTo(sf::RenderTarget &target) {
     this->password->drawTo(target);
 }
 
-bool LoginWindow::submitPressed() {
-    return this->submit_btn->isPressed();
+bool LoginWindow::submitPressed(char *message, int *fail_type) {
+    if(this->submit_btn->isPressed()) {
+        string s_username = this->username->getText();
+        string s_password = this->password->getText();
+
+        if (s_username.length() == 0 || s_password.length() == 0) {
+            *fail_type = 1;
+            return true;
+        }
+
+        rq_login rq;
+        rq.type = RQ_LOGIN;
+        rq.username = s_username;
+        rq.password = s_password;
+        *fail_type = 0;
+
+        struct_to_message(&rq, RQ_LOGIN, message);
+
+        return true;
+    }
+    return false;
 }
 
 bool LoginWindow::backPressed() {
