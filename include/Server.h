@@ -3,6 +3,7 @@
 
 #include "User.h"
 #include "GameConfig.h"
+#include "Message.h"
 #include <stdio.h>
 #include <iostream>
 #include <vector>
@@ -32,6 +33,9 @@ public:
 
     void run();
 
+    void rq_register();
+
+    void sendToClient(int connfd);
     void loadUserData(std::string path);
 };
 

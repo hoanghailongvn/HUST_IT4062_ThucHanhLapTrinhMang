@@ -32,13 +32,19 @@ enum StateTypes
 };
 
 class Client {
-private:
+private: 
+
+    //Network
+    int clientfd;
+    char buff[BUFF_SIZE + 1];
+    struct sockaddr_in servAddr;
     // Variables
+
     // Window
     sf::RenderWindow* window;
     sf::VideoMode videoMode;
     sf::Event ev;
-    StateTypes state;
+    StateTypes state, previous_state;
 
     // Mouse position
     sf::Vector2i mousePosWindow;
@@ -51,6 +57,7 @@ private:
     RegisterWindow *registerWindow;
     LoginWindow *loginWindow;
 
+    void initNetwork();
     void initVariables();
     void initWindow();
     void initIntroWindow();
@@ -68,34 +75,17 @@ public:
     void updateMousePositions();
     void update();
     void render();
+
+    //Network
+    void communicate();
+    void run();
+    void sendToServer();
+
+    void rcv_rp_register();
+
+    void closeSocket();
 };
 
 #endif
 
 
-// #include <iostream>
-// #include <stdio.h>
-// #include <string.h>
-// #include "GameConfig.h"
-// #include "Window.h"
-// #include "Message.h"
-
-// #include <arpa/inet.h> // in_addr
-// #include <sys/socket.h> // socklen_t
-// #include <netdb.h> //dns
-// #include <unistd.h> //close
-
-// class Client {
-// private:
-//     int clientfd;
-//     char buff[BUFF_SIZE + 1];
-//     struct sockaddr_in servAddr;
-    
-// public:
-//     Client();
-//     ~Client();
-
-//     void communicate();
-//     void run();
-//     void closeSocket();
-// };

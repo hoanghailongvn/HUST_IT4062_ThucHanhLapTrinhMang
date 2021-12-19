@@ -4,9 +4,12 @@ using namespace std;
 
 vector<char *> split(char *input, const char *delimiter) {
     vector<char *> res;
-    
+
+    char input_copy[100];
+    strcpy(input_copy, input);
+
     char *token;
-    token = strtok(input, delimiter);
+    token = strtok(input_copy, delimiter);
 
     while(token != NULL) {
         char* temp = (char *)malloc(strlen(token) + 1);
@@ -15,7 +18,6 @@ vector<char *> split(char *input, const char *delimiter) {
 
         token = strtok(NULL, delimiter);
     }
-
     return res;
 }
 
@@ -37,8 +39,16 @@ void struct_to_message(void *p, MessageType type, char *output) {
         break;
     }
     case RP_REGISTER:
-        break;
+    {
+        auto *struct_obj = (rp_register *)p;
+        final << struct_obj->type << "\n";
+        final << struct_obj->accept << "\n";
+        final << struct_obj->notification << "\0";
 
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     default:
         break;
     }
@@ -46,11 +56,17 @@ void struct_to_message(void *p, MessageType type, char *output) {
 
 rq_register *message_to_rq_register(char *message) {
     vector <char *> splited_line = split(message, "\n");
-
     rq_register *res = new rq_register;
     res->type = RQ_REGISTER;
     res->username = splited_line.at(1);
     res->password = splited_line.at(2);
+
+    return res;
+}
+
+int getCode(char *input) {
+    vector <char *> splited_line = split(input, "\n");
+    int res = atoi(splited_line.at(0));
 
     return res;
 }

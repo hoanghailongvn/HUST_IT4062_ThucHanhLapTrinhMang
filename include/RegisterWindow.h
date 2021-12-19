@@ -7,6 +7,7 @@
 #include "GameConfig.h"
 #include "Button.h"
 #include "Textbox.h"
+#include "Message.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -34,7 +35,7 @@ public:
     void drawTo(sf::RenderTarget &target);
     void setSelected(Textbox *textbox);
 
-    bool submitPressed();
+    bool submitPressed(char *message);
     bool backPressed();
 };
 

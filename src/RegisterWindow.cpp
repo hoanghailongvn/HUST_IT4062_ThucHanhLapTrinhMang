@@ -1,5 +1,7 @@
 #include "../include/RegisterWindow.h"
 
+using namespace std;
+
 RegisterWindow::RegisterWindow(sf::Font *font) {
     this->main = new sf::Text();
     this->main->setString("Register");
@@ -67,8 +69,33 @@ void RegisterWindow::drawTo(sf::RenderTarget &target) {
     this->password_2->drawTo(target);
 }
 
-bool RegisterWindow::submitPressed() {
-    return this->submit_btn->isPressed();
+bool RegisterWindow::submitPressed(char *message) {
+    if (this->submit_btn->isPressed()) {
+        string s_username = this->username->getText();
+        string s_password_1 = this->password_1->getText();
+        string s_password_2 = this->password_2->getText();
+
+        if (s_username.length() == 0 || s_password_1.length() == 0 || s_password_2.length() == 0) {
+            //NOTIFICATION
+            cout << "not enough\n";
+            return false;
+        }
+        if (s_password_1.compare(s_password_2) != 0) {
+            //NOTIFICATION
+            cout << "Not same\n";
+            return false;
+        }
+
+        rq_register rq;
+        rq.username = s_username;
+        rq.password = s_password_1;
+
+        struct_to_message(&rq, RQ_REGISTER, message);
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool RegisterWindow::backPressed() {

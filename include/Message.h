@@ -1,3 +1,6 @@
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
 #include <string>
 #include <string.h>
 #include <sstream>
@@ -56,3 +59,7 @@ rp_login *message_to_rp_login(char *message);
 
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<char *> split(char *input, const char *delimiter);
+
+int getCode(char *input);
+
+#endif
