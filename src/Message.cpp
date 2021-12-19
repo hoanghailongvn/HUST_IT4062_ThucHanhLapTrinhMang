@@ -38,18 +38,14 @@ void struct_to_message(void *p, MessageType type, char *output) {
     }
 }
 
-void message_to_struct(char *message, MessageType *type, void *p) {
+rq_register *message_to_rq_register(char *message) {
     vector <char *> *splited_line = new vector<char *>();
     split(message, "\n", splited_line);
 
-    switch (atoi(splited_line->at(0)))
-    {
-    case RQ_REGISTER:
-        cout << "OK" << endl;
-        break;
-    
-    default:
-        break;
-    }
-    
+    rq_register *res = new rq_register;
+    res->type = RQ_REGISTER;
+    res->username = splited_line->at(1);
+    res->password = splited_line->at(2);
+
+    return res;
 }

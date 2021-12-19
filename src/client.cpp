@@ -16,9 +16,10 @@ int main() {
 
     struct_to_message((void *)stru, RQ_REGISTER, message);
     
-    MessageType temp;
-    void *temp_stru;
-    message_to_struct(message, &temp, temp_stru);
+    rq_register *res;
+    res = message_to_rq_register(message);
+    std::cout<< res->type << "\n";
+    std::cout << res->username << "\n";
 
     return 0;
 }

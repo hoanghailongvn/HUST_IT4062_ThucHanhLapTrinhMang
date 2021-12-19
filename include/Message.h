@@ -20,6 +20,7 @@ struct rp_register {
 
 void struct_to_message(void *p, MessageType type, char *output);
 
-void message_to_struct(char *message, MessageType *type, void *p);
+rq_register *message_to_rq_register(char *message);
+rp_register *message_to_rp_register(char *message);
 
 void split(char *input, const char *delimiter, std::vector<char *> *output);
