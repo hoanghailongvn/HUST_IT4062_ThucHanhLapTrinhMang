@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-enum button_states{BTN_IDLE, BTN_HOVER, BTN_ACTIVE};
+enum button_states{BTN_IDLE, BTN_HOVER};
 
 class Button {
 private:
@@ -20,12 +20,11 @@ private:
     
     sf::Color idleColor;
     sf::Color hoverColor;
-    sf::Color activeColor;
 
 public:
     Button(float x, float y, float width, float height, 
         sf::Font *font, std::string text, int fontSize,
-        sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor);
+        sf::Color idleColor, sf::Color hoverColor);
     ~Button();
 
     void update(sf::Vector2f mousePos);

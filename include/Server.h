@@ -34,6 +34,7 @@ public:
     void run();
 
     void rq_register();
+    void rq_login();
 
     void sendToClient(int connfd);
     void loadUserData(std::string path);

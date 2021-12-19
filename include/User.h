@@ -4,9 +4,9 @@
 #include <string>
 #include "GameConfig.h"
 
+enum State {OFFLINE, ONLINE, INGAME};
+
 class User {
-public: 
-    enum State {OFFLINE, ONLINE, INGAME};
 private:
     State state;
     std::string username;

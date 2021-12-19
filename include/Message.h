@@ -53,8 +53,8 @@ rq_register message_to_rq_register(char *message);
 rp_register message_to_rp_register(char *message);
 
 //TODO
-rq_login *message_to_rq_login(char *message);
-rp_login *message_to_rp_login(char *message);
+rq_login message_to_rq_login(char *message);
+rp_login message_to_rp_login(char *message);
 
 
 //Phân tách input bằng delimiter và trả về vector 

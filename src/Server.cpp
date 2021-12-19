@@ -51,6 +51,7 @@ void Server::run()
     while (1) {
         // Accept request
         connfd = accept(this->listenfd, (sockaddr*)&clientAddr, &clientAddrLen);
+        cout << connfd << endl;
         if (connfd < 0) {
             perror("Error");
             exit(1);
@@ -74,6 +75,9 @@ void Server::run()
                     this->rq_register();
                     this->sendToClient(connfd);
                     break;
+                
+                case RQ_LOGIN:
+                    this->rq_login();
 
                 default:
                     break;
@@ -143,6 +147,13 @@ void Server::rq_register()
     
     struct_to_message(&rp, RP_REGISTER, this->buff);
 }
+
+void Server::rq_login() {
+    struct rq_login rq = message_to_rq_login(this->buff);
+    struct rp_login rp;
+    
+}
+
 
 void Server::sendToClient(int connfd) {
     int sendBytes = send(connfd, this->buff, strlen(this->buff), 0);

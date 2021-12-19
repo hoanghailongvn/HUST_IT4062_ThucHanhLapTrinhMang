@@ -10,8 +10,8 @@ IntroWindow::IntroWindow(sf::Font *font) {
     this->main->setOrigin(textRect.left + textRect.width/2.f, textRect.top + textRect.height/2.f);
     this->main->setPosition(screenWidth/2.f, 150);
 
-    this->register_btn = new Button(100, 300, 300, 100, font, "Register", 36, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
-    this->login_btn = new Button(600, 300, 300, 100, font, "Login", 36, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
+    this->register_btn = new Button(100, 300, 300, 100, font, "Register", 36, sf::Color::Black, sf::Color::Magenta);
+    this->login_btn = new Button(600, 300, 300, 100, font, "Login", 36, sf::Color::Black, sf::Color::Magenta);
 }
 
 IntroWindow::~IntroWindow() {

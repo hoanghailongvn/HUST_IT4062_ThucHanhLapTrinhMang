@@ -14,7 +14,7 @@ void User::setState(State state) {
     this->state = state;
 }
 
-User::State User::getState() {
+State User::getState() {
     return this->state;
 }
 

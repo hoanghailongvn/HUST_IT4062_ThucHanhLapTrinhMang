@@ -11,8 +11,8 @@ LoginWindow::LoginWindow(sf::Font *font) {
     this->main->setPosition(screenWidth/2.f, 150);
 
 
-    this->submit_btn = new Button(350, 450, 300, 100, font, "Submit", 36, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
-    this->back_btn = new Button(50, 550, 60, 20, font, "Back", 16, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
+    this->submit_btn = new Button(350, 450, 300, 100, font, "Submit", 36, sf::Color::Black, sf::Color::Magenta);
+    this->back_btn = new Button(50, 550, 60, 20, font, "Back", 16, sf::Color::Black, sf::Color::Magenta);
     this->username = new Textbox(200, 250, font, "Username  : ", 26, sf::Color::White, true, usernameMaxLength);
     this->password = new Textbox(200, 300, font, "Password  : ", 26, sf::Color::White, false, passwordMaxLength);
 
