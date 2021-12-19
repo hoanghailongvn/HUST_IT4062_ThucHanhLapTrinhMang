@@ -12,7 +12,6 @@ RegisterWindow::RegisterWindow(sf::Font *font) {
     this->main->setOrigin(textRect.left + textRect.width/2.f, textRect.top + textRect.height/2.f);
     this->main->setPosition(screenWidth/2.f, 150);
 
-
     this->submit_btn = new Button(350, 450, 300, 100, font, "Submit", 36, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
     this->back_btn = new Button(50, 550, 60, 20, font, "Back", 16, sf::Color::Black, sf::Color::Magenta, sf::Color::Black);
     this->username = new Textbox(200, 250, font, "Username  : ", 26, sf::Color::White, true, usernameMaxLength);
@@ -69,26 +68,32 @@ void RegisterWindow::drawTo(sf::RenderTarget &target) {
     this->password_2->drawTo(target);
 }
 
-bool RegisterWindow::submitPressed(char *message) {
+/*
+    @return true if pressed submit ||
+
+    fail_type = 0: no problem,
+    fail_type = 1: empty field,
+    fail_type = 2: password != repassword
+*/
+bool RegisterWindow::submitPressed(char *message, int *fail_type) {
     if (this->submit_btn->isPressed()) {
         string s_username = this->username->getText();
         string s_password_1 = this->password_1->getText();
         string s_password_2 = this->password_2->getText();
 
         if (s_username.length() == 0 || s_password_1.length() == 0 || s_password_2.length() == 0) {
-            //NOTIFICATION
-            cout << "not enough\n";
-            return false;
+            *fail_type = 1;
+            return true;
         }
         if (s_password_1.compare(s_password_2) != 0) {
-            //NOTIFICATION
-            cout << "Not same\n";
-            return false;
+            *fail_type = 2;
+            return true;
         }
 
         rq_register rq;
         rq.username = s_username;
         rq.password = s_password_1;
+        *fail_type = 0;
 
         struct_to_message(&rq, RQ_REGISTER, message);
 

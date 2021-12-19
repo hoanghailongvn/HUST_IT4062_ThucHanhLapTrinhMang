@@ -16,6 +16,7 @@
 #include "../include/IntroWindow.h"
 #include "../include/RegisterWindow.h"
 #include "../include/LoginWindow.h"
+#include "../include/Notification.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -44,7 +45,7 @@ private:
     sf::RenderWindow* window;
     sf::VideoMode videoMode;
     sf::Event ev;
-    StateTypes state, previous_state;
+    StateTypes state, next_state;
 
     // Mouse position
     sf::Vector2i mousePosWindow;
@@ -56,6 +57,7 @@ private:
     IntroWindow *introWindow;
     RegisterWindow *registerWindow;
     LoginWindow *loginWindow;
+    Notification *notification;
 
     void initNetwork();
     void initVariables();
@@ -63,6 +65,7 @@ private:
     void initIntroWindow();
     void initRegisterWindow();
     void initLoginWindow();
+    void initNotification();
     void initFont();
 
 public:

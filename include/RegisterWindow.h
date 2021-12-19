@@ -12,12 +12,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-struct RegisterForm {
-    char username[usernameMaxLength + 1];
-    char password_1[passwordMaxLength + 1];
-    char password_2[passwordMaxLength + 1];
-};
-
 class RegisterWindow {
     private:
     Button *submit_btn, *back_btn;
@@ -35,7 +29,7 @@ public:
     void drawTo(sf::RenderTarget &target);
     void setSelected(Textbox *textbox);
 
-    bool submitPressed(char *message);
+    bool submitPressed(char *message, int *fail_type);
     bool backPressed();
 };
 

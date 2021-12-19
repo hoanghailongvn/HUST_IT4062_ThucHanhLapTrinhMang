@@ -37,6 +37,10 @@ void Client::initLoginWindow() {
     this->loginWindow = new LoginWindow(this->font);
 }
 
+void Client::initNotification() {
+    this->notification = new Notification(this->font);
+}
+
 void Client::initFont() {
     this->font = new sf::Font();
     this->font->loadFromFile(fontPerfectDosPath);
@@ -52,6 +56,7 @@ Client::Client() {
     this->initIntroWindow();
     this->initRegisterWindow();
     this->initLoginWindow();
+    this->initNotification();
 }
 
 Client::~Client() {
@@ -59,6 +64,7 @@ Client::~Client() {
     delete this->introWindow;
     delete this->registerWindow;
     delete this->font;
+    delete this->notification;
 }
 
 const bool Client::running() const
@@ -70,22 +76,27 @@ void Client::pollEvents()
 {
     // Event polling
     while (this->window->pollEvent(this->ev)) {
-        switch (this->ev.type) {
-        case sf::Event::Closed:
+        if (this->ev.type == sf::Event::Closed) {
             this->window->close();
-            break;
-        case sf::Event::TextEntered:
-            switch (this->state)
-            {
-            case REGISTER:
+            continue;
+        }
+
+        switch (this->state)
+        {
+        case REGISTER:
+            if (ev.type == sf::Event::TextEntered) {
                 this->registerWindow->typedOn(ev);
-                break;
-            
-            case LOGIN:
+            }
+            break;
+        
+        case LOGIN:
+            if (ev.type == sf::Event::TextEntered) {
                 this->loginWindow->typedOn(ev);
-                break;
-            default:
-                break;
+            }
+        
+        case NOTIFICATION:
+            if (ev.type == sf::Event::MouseButtonPressed) {
+                this->state = this->next_state;
             }
         default:
             break;
@@ -123,9 +134,28 @@ void Client::update()
         if(registerWindow->backPressed()) {
             this->state = INTRO;
         }
-        if(registerWindow->submitPressed(this->buff)) {
-            this->sendToServer();
-            this->rcv_rp_register();
+        int fail_type;
+        if(registerWindow->submitPressed(this->buff, &fail_type)) {
+            switch (fail_type)
+            {
+            case 0:
+                this->sendToServer();
+                this->rcv_rp_register();
+                break;
+            case 1: //emtpy field
+                this->notification->setText("Register Fail!!", 50, "Empty field", 20);
+                this->next_state = REGISTER;
+                break;
+            case 2:
+                this->notification->setText("Register Fail!!", 50, "Password not match!!", 20);
+                this->next_state = REGISTER;
+                break;
+            default:
+                break;
+            }
+            
+            this->state = NOTIFICATION;
+
         }
         break;
     case LOGIN:
@@ -160,6 +190,11 @@ void Client::render()
     case LOGIN:
         this->loginWindow->drawTo(*this->window);
         break;
+
+    case NOTIFICATION:
+        this->notification->drawTo(*this->window);
+        break;
+
     default:
         break;
     }

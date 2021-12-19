@@ -27,9 +27,7 @@ Button::Button(float x, float y, float width, float height,
 
     this->shape.setOutlineColor(sf::Color::White);
     this->shape.setOutlineThickness(3);
-
     this->shape.setFillColor(this->idleColor);
-
 }
 
 Button::~Button() {}

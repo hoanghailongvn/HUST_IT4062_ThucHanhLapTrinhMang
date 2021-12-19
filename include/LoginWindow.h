@@ -11,12 +11,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-struct LoginForm {
-    char username[usernameMaxLength + 1];
-    char password_1[passwordMaxLength + 1];
-    char password_2[passwordMaxLength + 1];
-};
-
 class LoginWindow {
     private:
     Button *submit_btn, *back_btn;
