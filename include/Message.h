@@ -49,8 +49,8 @@ struct rp_login {
 
 void struct_to_message(void *p, MessageType type, char *output);
 
-rq_register *message_to_rq_register(char *message);
-rp_register *message_to_rp_register(char *message);
+rq_register message_to_rq_register(char *message);
+rp_register message_to_rp_register(char *message);
 
 //TODO
 rq_login *message_to_rq_login(char *message);

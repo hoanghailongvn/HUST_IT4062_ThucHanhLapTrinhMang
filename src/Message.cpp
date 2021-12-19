@@ -54,12 +54,22 @@ void struct_to_message(void *p, MessageType type, char *output) {
     }
 }
 
-rq_register *message_to_rq_register(char *message) {
+rq_register message_to_rq_register(char *message) {
     vector <char *> splited_line = split(message, "\n");
-    rq_register *res = new rq_register;
-    res->type = RQ_REGISTER;
-    res->username = splited_line.at(1);
-    res->password = splited_line.at(2);
+    rq_register res;
+    res.type = RQ_REGISTER;
+    res.username = splited_line.at(1);
+    res.password = splited_line.at(2);
+
+    return res;
+}
+
+rp_register message_to_rp_register(char *message) {
+    vector <char *> splited_line = split(message, "\n");
+    rp_register res;
+    res.type = RP_REGISTER;
+    res.accept = atoi(splited_line.at(1));
+    res.notification = splited_line.at(2);
 
     return res;
 }

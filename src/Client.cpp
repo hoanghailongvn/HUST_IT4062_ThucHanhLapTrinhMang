@@ -226,6 +226,15 @@ void Client::rcv_rp_register() {
         perror("Error: ");
         exit(1);
     }
+    
+    struct rp_register rp = message_to_rp_register(this->buff);
+    if(rp.accept) {
+        this->notification->setText("Register Success!!", 50, "", 0);
+        this->next_state = INTRO;
+    } else {
+        this->notification->setText("Register Fail!!", 50, rp.notification, 30);
+        this->next_state = REGISTER;
+    }
 }
 
 void Client::closeSocket() {

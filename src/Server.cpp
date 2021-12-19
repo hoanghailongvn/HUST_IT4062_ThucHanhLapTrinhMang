@@ -78,11 +78,6 @@ void Server::run()
                 default:
                     break;
                 }
-
-                //     // rq_register *res;
-                //     // res = message_to_rq_register(message);
-                //     // std::cout<< res->type << "\n";
-                //     // std::cout << res->username << "\n";
             }
 
             
@@ -122,12 +117,12 @@ void sig_chld(int sig_no)
 
 void Server::rq_register()
 {
-    struct rq_register* rq = message_to_rq_register(this->buff);
+    struct rq_register rq = message_to_rq_register(this->buff);
     struct rp_register rp;
 
     bool check = true;
     for (auto user : this->listUser) {
-        if (user->getUsername().compare(rq->username) == 0) {
+        if (user->getUsername().compare(rq.username) == 0) {
             rp.accept = false;
             rp.notification = "User existed!!";
             check = false;
@@ -138,17 +133,15 @@ void Server::rq_register()
         rp.accept = true;
         rp.notification = "";
 
-        User* u = new User(rq->username, rq->password);
+        User* u = new User(rq.username, rq.password);
         this->listUser.push_back(u);
 
         ofstream WriteFile;
         WriteFile.open(userDataPath, std::ios_base::app);
-        WriteFile << rq->username << " " << rq->password << "\n";
+        WriteFile << rq.username << " " << rq.password << "\n";
     }
     
     struct_to_message(&rp, RP_REGISTER, this->buff);
-
-    delete rq;
 }
 
 void Server::sendToClient(int connfd) {
@@ -156,4 +149,5 @@ void Server::sendToClient(int connfd) {
     if(sendBytes < 0) {
         perror("Error");
     }
+    cout << "\nSend; \n" << this->buff << "\n";
 }
