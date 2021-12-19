@@ -15,11 +15,11 @@ rm = rm -f
 
 all: $(BINDIR)/server $(BINDIR)/client $(BINDIR)/sfml
 
-$(BINDIR)/server: $(OBJDIR)/server.o
+$(BINDIR)/server: $(OBJDIR)/server.o $(OBJDIR)/Server.o $(OBJDIR)/User.o
 	$(CXX) $^ -o $@
 
-$(BINDIR)/client: $(OBJDIR)/client.o
-	$(CXX) $^ -o $@
+$(BINDIR)/client: $(OBJDIR)/client.o $(OBJDIR)/Client.o $(OBJDIR)/Message.o $(OBJDIR)/Window.o $(OBJDIR)/Textbox.o $(OBJDIR)/Button.o $(OBJDIR)/IntroWindow.o $(OBJDIR)/RegisterWindow.o $(OBJDIR)/LoginWindow.o
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 $(BINDIR)/sfml: $(OBJDIR)/sfml.o $(OBJDIR)/Window.o $(OBJDIR)/Textbox.o $(OBJDIR)/Button.o $(OBJDIR)/IntroWindow.o $(OBJDIR)/RegisterWindow.o $(OBJDIR)/LoginWindow.o
 	$(CXX) $^ $(LDFLAGS) -o $@

@@ -1,19 +1,24 @@
 #ifndef USER_H
 #define USER_H
 
-#include <string.h>
+#include <string>
+#include "GameConfig.h"
 
 class User {
 public: 
-    enum State {IN_LOBBY, IN_ROOM, IN_GAME};
+    enum State {OFFLINE, ONLINE, INGAME};
 private:
     State state;
-    char name[30];
+    std::string username;
+    std::string password;
 public:
-    User();
+    User(std::string username, std::string password);
+    ~User();
 
-    void set_state(State state);
-    State get_state();
+
+    std::string getUsername();
+    void setState(State state);
+    State getState();
 };
 
 #endif

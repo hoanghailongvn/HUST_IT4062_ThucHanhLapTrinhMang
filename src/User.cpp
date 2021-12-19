@@ -1,11 +1,23 @@
 #include "../include/User.h"
 
-User::User() {};
+using namespace std;
 
-void User::set_state(State state) {
+User::User(string username, string password) {
+    this->state = OFFLINE;
+    this->username = username;
+    this->password = password;
+}
+
+User::~User() {}
+
+void User::setState(State state) {
     this->state = state;
 }
 
-User::State User::get_state() {
+User::State User::getState() {
     return this->state;
+}
+
+string User::getUsername() {
+    return this->username;
 }
