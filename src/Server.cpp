@@ -184,6 +184,23 @@ void Server::rq_login(struct sockaddr_in *clientAddr) {
     struct_to_message(&rp, RP_LOGIN, this->buff);
 }
 
+void Server::rq_logout() {
+    struct rq_logout rq = message_to_rq_logout(this->buff);
+    struct rp_logout rp;
+
+    for (auto user : this->listUser) {
+        if (user->getUsername().compare(rq.username) == 0) {
+            user->setState(OFFLINE);
+            break;
+        }
+    }
+    rp.accept = true;
+    rp.notification = " ";
+    
+    struct_to_message(&rp, RP_LOGOUT, this->buff);
+    
+}
+
 
 void Server::sendToClient(int connfd) {
     int sendBytes = send(connfd, this->buff, strlen(this->buff), 0);
