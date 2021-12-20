@@ -21,7 +21,8 @@
 */
 
 // Nghĩ thêm các loại message rồi cho vô enum
-enum MessageType {RQ_REGISTER = 0, RP_REGISTER, RQ_LOGIN, RP_LOGIN};
+enum MessageType {RQ_REGISTER = 0, RP_REGISTER, RQ_LOGIN, RP_LOGIN, RQ_LOGOUT, RP_LOGOUT, RQ_CREATE_ROOM, RP_CREATE_ROOM, RQ_JOIN_ROOM, RP_JOIN_ROOM,
+RQ_UPDATE_LOBBY, RP_UPDATE_LOBBY};
 
 struct rq_register {
     MessageType type = RQ_REGISTER;
@@ -47,6 +48,46 @@ struct rp_login {
     std::string notification;
 };
 
+struct rq_logout {
+    MessageType type = RQ_LOGOUT;
+    std::string username;
+};
+
+struct rp_logout {
+    MessageType type = RP_LOGOUT;
+    bool accept;
+    std::string notification;
+};
+struct rq_create_room {
+    MessageType type = RQ_CREATE_ROOM;
+    std::string name;
+};
+
+struct rp_create_room {
+    MessageType type = RP_CREATE_ROOM;
+    bool accept;
+    std::string notification;
+};
+
+struct rq_join_room {
+    MessageType type = RQ_JOIN_ROOM;
+    std::string id;
+};
+
+struct rp_join_room {
+    MessageType type = RP_JOIN_ROOM;
+    bool accept;
+    std::string notification;
+};
+
+struct rq_update_lobby{
+    MessageType type = RQ_UPDATE_LOBBY;
+};
+
+struct rp_update_lobby{
+    MessageType type = RP_UPDATE_LOBBY;
+};
+
 void struct_to_message(void *p, MessageType type, char *output);
 
 rq_register message_to_rq_register(char *message);
@@ -55,8 +96,12 @@ rp_register message_to_rp_register(char *message);
 //TODO
 rq_login message_to_rq_login(char *message);
 rp_login message_to_rp_login(char *message);
-
-
+rq_logout message_to_rq_logout(char *message);
+rp_logout message_to_rp_logout(char *message);
+rq_join_room message_to_rq_join_room(char *message);
+rp_join_room message_to_rp_join_room(char *message);
+rq_update_lobby message_to_rq_update_lobby(char *message);
+rp_update_lobby message_to_rp_update_lobby(char *message);
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<char *> split(char *input, const char *delimiter);
 

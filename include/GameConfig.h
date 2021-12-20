@@ -9,7 +9,7 @@
 #define fontArcadePath "fonts/ARCADECLASSIC.TTF"
 #define fontPriceDownPath "fonts/pricedown.otf"
 #define fontUpheavttPath "fonts/upheavtt.ttf"
-#define fontPerfectDosPath "fonts/Perfect DOS VGA 437.ttf"
+#define fontPerfectDosPath "../fonts/Perfect DOS VGA 437.ttf"
 #define userDataPath "data/password.txt"
 #define BUFF_SIZE 1024
 #define SERVER_PORT 8080

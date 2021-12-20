@@ -35,6 +35,7 @@ public:
 
     void rq_register();
     void rq_login(struct sockaddr_in *clientAddr);
+    void rq_logout();
 
     void sendToClient(int connfd);
     void loadUserData(std::string path);
