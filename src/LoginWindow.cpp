@@ -73,7 +73,6 @@ bool LoginWindow::submitPressed(char *message, int *fail_type) {
         }
 
         rq_login rq;
-        rq.type = RQ_LOGIN;
         rq.username = s_username;
         rq.password = s_password;
         *fail_type = 0;

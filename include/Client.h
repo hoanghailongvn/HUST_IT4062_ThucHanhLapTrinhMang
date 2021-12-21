@@ -6,6 +6,7 @@
 #include <string.h>
 #include "GameConfig.h"
 #include "Message.h"
+#include "User.h"
 
 #include <arpa/inet.h> // in_addr
 #include <sys/socket.h> // socklen_t
@@ -40,6 +41,8 @@ private:
     int clientfd;
     char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
+
+    std::string userName;
     // Variables
 
     // Window
@@ -91,6 +94,7 @@ public:
 
     void rp_register();
     void rp_login();
+    void rp_logout();
 
     void closeSocket();
 };

@@ -33,7 +33,7 @@ struct rq_register {
 struct rp_register {
     MessageType type = RP_REGISTER;
     bool accept;
-    std::string notification;
+    std::string notification = " ";
 };
 
 struct rq_login {
@@ -45,18 +45,18 @@ struct rq_login {
 struct rp_login {
     MessageType type = RP_LOGIN;
     bool accept;
-    std::string notification;
+    std::string notification = " ";
+    std::string username;
 };
 
 struct rq_logout {
     MessageType type = RQ_LOGOUT;
-    std::string username;
 };
 
 struct rp_logout {
     MessageType type = RP_LOGOUT;
     bool accept;
-    std::string notification;
+    std::string notification = " ";
 };
 struct rq_create_room {
     MessageType type = RQ_CREATE_ROOM;
@@ -66,7 +66,7 @@ struct rq_create_room {
 struct rp_create_room {
     MessageType type = RP_CREATE_ROOM;
     bool accept;
-    std::string notification;
+    std::string notification = " ";
 };
 
 struct rq_join_room {
@@ -77,7 +77,7 @@ struct rq_join_room {
 struct rp_join_room {
     MessageType type = RP_JOIN_ROOM;
     bool accept;
-    std::string notification;
+    std::string notification = " ";
 };
 
 struct rq_update_lobby{
@@ -93,17 +93,23 @@ void struct_to_message(void *p, MessageType type, char *output);
 rq_register message_to_rq_register(char *message);
 rp_register message_to_rp_register(char *message);
 
-//TODO
 rq_login message_to_rq_login(char *message);
 rp_login message_to_rp_login(char *message);
+
 rq_logout message_to_rq_logout(char *message);
 rp_logout message_to_rp_logout(char *message);
+
+rq_create_room message_to_rq_create_room(char *message);
+rp_create_room message_to_rp_create_room(char *message);
+
 rq_join_room message_to_rq_join_room(char *message);
 rp_join_room message_to_rp_join_room(char *message);
+
 rq_update_lobby message_to_rq_update_lobby(char *message);
 rp_update_lobby message_to_rp_update_lobby(char *message);
+
 //Phân tách input bằng delimiter và trả về vector 
-std::vector<char *> split(char *input, const char *delimiter);
+std::vector<std::string> split(char *input, std::string delimiter);
 
 int getCode(char *input);
 

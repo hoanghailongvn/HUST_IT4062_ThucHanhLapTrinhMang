@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include "User.h"
+#include "Room.h"
 #include "GameConfig.h"
 #include "Message.h"
 #include <stdio.h>
@@ -21,6 +22,7 @@ void sig_chld(int signo);
 class Server {
 private:
     std::vector<User *> listUser;
+    std::vector<Room *> listRoom;
     int listenfd;
     char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
@@ -34,10 +36,12 @@ public:
     void run();
 
     void rq_register();
-    void rq_login(struct sockaddr_in *clientAddr);
-    void rq_logout();
+    void rq_login(struct sockaddr_in *clientAddr, User *&clientUser);
+    void rq_logout(User *&clientUser);
+    void rq_createRoom(User *&clientUser);
 
-    void sendToClient(int connfd);
+    void rcvFromClient(int connfd, struct sockaddr_in clientAddr);
+    void sendToClient(int connfd, struct sockaddr_in clientAddr);
     void loadUserData(std::string path);
 };
 

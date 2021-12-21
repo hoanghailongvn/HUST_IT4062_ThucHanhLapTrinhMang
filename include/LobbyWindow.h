@@ -18,9 +18,12 @@ private:
     // Textbox *username, *password_1, *password_2;
     // std::list<Textbox *> listTextbox;
     sf::Text *main;
+    sf::Text *userName;
 public:
     LobbyWindow(sf::Font *font);
     ~LobbyWindow();
+
+    void setUsername(std::string username);
 
     void refresh();
 
@@ -28,7 +31,7 @@ public:
     void drawTo(sf::RenderTarget &target);
 
     // bool submitPressed(char *message, int *fail_type);
-    bool logoutPressed();
+    bool logoutPressed(char *message);
 
 };
 

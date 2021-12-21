@@ -182,8 +182,10 @@ void Client::pollEvents()
             break;
         case LOBBY:
             if (ev.type == sf::Event::MouseButtonPressed) {
-                if (this->lobbyWindow->logoutPressed()) {
-                    //TODO
+                if (this->lobbyWindow->logoutPressed(this->buff)) {
+                    this->sendToServer();
+                    this->rcvFromServer();
+                    this->rp_logout();
                     this->next_state = INTRO;
                     this->state = NOTIFICATION;
                 }
@@ -299,11 +301,25 @@ void Client::rp_login() {
     if (rp.accept) {
         this->notification->setText("Login Success!!", 50, "", 0);
         this->next_state = LOBBY;
+        this->userName = rp.username;
+        this->lobbyWindow->setUsername(this->userName);
     } else {
         this->notification->setText("Login Fail!!", 50, rp.notification, 30);
         this->next_state = LOGIN;
     }
 
+}
+
+void Client::rp_logout() {
+    struct rp_logout rp = message_to_rp_logout(this->buff);
+    if (rp.accept) {
+        this->notification->setText("Logout Success!!", 50, "", 0);
+        this->next_state = INTRO;
+        this->userName = "";
+    } else {
+        this->notification->setText("Logout Fail!!", 50, rp.notification, 30);
+        this->next_state = LOBBY;
+    }
 }
 
 void Client::closeSocket()

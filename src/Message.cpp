@@ -2,22 +2,19 @@
 
 using namespace std;
 
-vector<char *> split(char *input, const char *delimiter) {
-    vector<char *> res;
+vector<string> split(char *input, string delimiter) {
+    vector<string> res;
 
-    char input_copy[100];
-    strcpy(input_copy, input);
-
-    char *token;
-    token = strtok(input_copy, delimiter);
-
-    while(token != NULL) {
-        char* temp = (char *)malloc(strlen(token) + 1);
-        strcpy(temp, token);
-        res.push_back(temp);
-
-        token = strtok(NULL, delimiter);
+    size_t pos = 0;
+    std::string token;
+    string input_copy = input;
+    while ((pos = input_copy.find(delimiter)) != std::string::npos) {
+        token = input_copy.substr(0, pos);
+        res.push_back(token);
+        input_copy.erase(0, pos + delimiter.length());
     }
+    res.push_back(input_copy);
+
     return res;
 }
 
@@ -65,7 +62,8 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rp_login *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
-        final << struct_obj->notification << "\0";
+        final << struct_obj->notification << "\n";
+        final << struct_obj->username << "\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -75,8 +73,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_LOGOUT:
     {
         auto *struct_obj = (rq_logout *)p;
-        final << struct_obj->type << "\n";
-        final << struct_obj->username << "\0";
+        final << struct_obj->type << "\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -162,7 +159,11 @@ void struct_to_message(void *p, MessageType type, char *output) {
 }
 
 rq_register message_to_rq_register(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
+    if (splited_line.size() != 3) {
+        cout << "message_to_rq_register error!!\n";
+        exit(1);
+    }
     rq_register res;
     res.type = RQ_REGISTER;
     res.username = splited_line.at(1);
@@ -172,21 +173,19 @@ rq_register message_to_rq_register(char *message) {
 }
 
 rp_register message_to_rp_register(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
+
     rp_register res;
     res.type = RP_REGISTER;
-    res.accept = atoi(splited_line.at(1));
-    if (!res.accept) {
-        res.notification = splited_line.at(2);
-    } else {
-        res.notification = "";
-    }
+    res.accept = stoi(splited_line.at(1));
+    res.notification = splited_line.at(2);
+    
 
     return res;
 }
 
 rq_login message_to_rq_login(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rq_login res;
     res.username = splited_line.at(1);
     res.password = splited_line.at(2);
@@ -195,30 +194,28 @@ rq_login message_to_rq_login(char *message) {
 }
 
 rp_login message_to_rp_login(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rp_login res;
-    res.accept = atoi(splited_line.at(1));
+    res.accept = stoi(splited_line.at(1));
     if (!res.accept) {
         res.notification = splited_line.at(2);
+        res.username = "";
     } else {
-        res.notification = "";
+        res.username = splited_line.at(3);
     }
 
     return res;
 }
 
 rq_logout message_to_rq_logout(char *message) {
-    vector <char *> splited_line = split(message, "\n");
     rq_logout res;
-    res.username = splited_line.at(1);
-
     return res;
 }
 
 rp_logout message_to_rp_logout(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rp_logout res;
-    res.accept = atoi(splited_line.at(1));
+    res.accept = stoi(splited_line.at(1));
     if (!res.accept) {
         res.notification = splited_line.at(2);
     } else {
@@ -228,7 +225,7 @@ rp_logout message_to_rp_logout(char *message) {
     return res;
 }
 rq_join_room message_to_rq_join_room(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rq_join_room res;
     res.id = splited_line.at(1);
 
@@ -236,9 +233,9 @@ rq_join_room message_to_rq_join_room(char *message) {
 }
 
 rp_join_room message_to_rp_join_room(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rp_join_room res;
-    res.accept = atoi(splited_line.at(1));
+    res.accept = stoi(splited_line.at(1));
     if (!res.accept) {
         res.notification = splited_line.at(2);
     } else {
@@ -247,8 +244,30 @@ rp_join_room message_to_rp_join_room(char *message) {
     
     return res;
 }
+
+rq_create_room message_to_rq_create_room(char *message) {
+    auto splited_line = split(message, "\n");
+    rq_create_room res;
+    res.name = splited_line.at(1);
+    
+    return res;
+}
+
+rp_create_room message_to_rp_create_room(char *message) {
+    auto splited_line = split(message, "\n");
+    rp_create_room res;
+    res.accept = stoi(splited_line.at(1));
+    if (!res.accept) {
+        res.notification = splited_line.at(2);
+    } else {
+        res.notification = "";
+    }
+
+    return res;
+}
+
 rq_update_lobby message_to_rq_update_lobby(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rq_update_lobby res;
     // res.id = splited_line.at(1);
 
@@ -256,7 +275,7 @@ rq_update_lobby message_to_rq_update_lobby(char *message) {
 }
 
 rp_update_lobby message_to_rp_update_lobby(char *message) {
-    vector <char *> splited_line = split(message, "\n");
+    auto splited_line = split(message, "\n");
     rp_update_lobby res;
     // res.accept = atoi(splited_line.at(1));
     // if (!res.accept) {
@@ -268,8 +287,8 @@ rp_update_lobby message_to_rp_update_lobby(char *message) {
     return res;
 }
 int getCode(char *input) {
-    vector <char *> splited_line = split(input, "\n");
-    int res = atoi(splited_line.at(0));
+    auto splited_line = split(input, "\n");
+    int res = stoi(splited_line.at(0));
 
     return res;
 }

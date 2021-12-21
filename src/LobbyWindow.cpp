@@ -12,12 +12,23 @@ LobbyWindow::LobbyWindow(sf::Font *font) {
     this->main->setOrigin(textRect.left + textRect.width/2.f, textRect.top + textRect.height/2.f);
     this->main->setPosition(screenWidth/2.f, 50);
 
+    this->userName = new sf::Text();
+    this->userName->setFont(*font);
+    this->userName->setFillColor(sf::Color::White);
+    this->userName->setCharacterSize(20);
+    this->userName->setPosition(10, 10);
+
     this->logout_btn = new Button(50, 550, 60, 20, font, "Logout", 16, sf::Color::Black, sf::Color::Magenta);
 }
 
 LobbyWindow::~LobbyWindow() {
     delete this->main;
+    delete this->userName;
     delete this->logout_btn;
+}
+
+void LobbyWindow::setUsername(string username) {
+    this->userName->setString("User: " + username);
 }
 
 void LobbyWindow::update(sf::Vector2f mousePos) {
@@ -26,9 +37,16 @@ void LobbyWindow::update(sf::Vector2f mousePos) {
 
 void LobbyWindow::drawTo(sf::RenderTarget &target) {
     target.draw(*this->main);
+    target.draw(*this->userName);
     this->logout_btn->drawTo(target);
 }
 
-bool LobbyWindow::logoutPressed() {
-    return this->logout_btn->isPressed();
+bool LobbyWindow::logoutPressed(char *message) {
+    if (this->logout_btn->isPressed()) {
+        rq_logout rq;
+        struct_to_message(&rq, RQ_LOGOUT, message);
+
+        return true;
+    }
+    return false;
 }
