@@ -14,7 +14,7 @@
 #include <SFML/Window.hpp>
 
 class LoginWindow {
-    private:
+protected:
     Button *submit_btn, *back_btn;
     Textbox *username, *password;
     std::list<Textbox *> listTextbox;

@@ -15,8 +15,9 @@
 class LobbyWindow {
 private:
     Button *logout_btn;
-    // Textbox *username, *password_1, *password_2;
-    // std::list<Textbox *> listTextbox;
+    Button *createRoom_btn;
+    Button *joinRoom_btn;
+    
     sf::Text *main;
     sf::Text *userName;
 public:
@@ -32,7 +33,7 @@ public:
 
     // bool submitPressed(char *message, int *fail_type);
     bool logoutPressed(char *message);
-
+    bool createRoomPressed();
 };
 
 #endif

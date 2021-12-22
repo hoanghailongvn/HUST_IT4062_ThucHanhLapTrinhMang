@@ -217,6 +217,7 @@ void* Server::routine(void *client_socket) {
         switch (getCode(rcv_message)) {
         case RQ_EXIT:
             exit_check = true;
+            clientUser->setState(OFFLINE);
             break;
         case RQ_REGISTER:
             Server::rq_register(rcv_message, send_message);

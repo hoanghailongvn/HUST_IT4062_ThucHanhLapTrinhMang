@@ -50,6 +50,10 @@ void Client::initNotification()
     this->notification = new Notification(this->font);
 }
 
+void Client::initCreateRoomWindow() {
+    this->createRoomWindow = new CreateRoomWindow(this->font);
+}
+
 void Client::initFont()
 {
     this->font = new sf::Font();
@@ -69,6 +73,7 @@ Client::Client()
     this->initLoginWindow();
     this->initLobbyWindow();
     this->initNotification();
+    this->initCreateRoomWindow();
 }
 
 Client::~Client()
@@ -80,6 +85,7 @@ Client::~Client()
     delete this->loginWindow;
     delete this->lobbyWindow;
     delete this->notification;
+    delete this->createRoomWindow;
 }
 
 const bool Client::running() const
@@ -187,7 +193,9 @@ void Client::pollEvents()
             }
             break;
         case LOBBY:
-            if (ev.type == sf::Event::MouseButtonPressed) {
+            switch (ev.type)
+            {
+            case sf::Event::MouseButtonPressed:
                 if (this->lobbyWindow->logoutPressed(this->buff)) {
                     this->sendToServer();
                     this->rcvFromServer();
@@ -195,7 +203,42 @@ void Client::pollEvents()
                     this->next_state = INTRO;
                     this->state = NOTIFICATION;
                 }
+                if (this->lobbyWindow->createRoomPressed()) {
+                    this->state = CREATEROOM;
+                    this->createRoomWindow->refresh();
+                }
+                break;
+            
+            default:
+                break;
             }
+            break;
+        case CREATEROOM:
+            switch (ev.type)
+            {
+            case sf::Event::TextEntered:
+                this->createRoomWindow->typedOn(ev);
+                break;
+            
+            case sf::Event::MouseButtonPressed:
+                if (this->createRoomWindow->backPressed()) {
+                    this->state = LOBBY;
+                }
+                int fail_type;
+                if (createRoomWindow->submitPressed(this->buff, &fail_type)) {
+                    if(fail_type == 0) {
+                        this->sendToServer();
+                        this->rcvFromServer();
+                        this->rp_createRoom();
+                    } else if (fail_type == 1) {
+                        this->notification->setText("Create Room Fail!!", 50, "Empty field.", 30);
+                        this->next_state = CREATEROOM;
+                    }
+                    this->state = NOTIFICATION;
+                }
+                break;
+            }
+            break;
         default:
             break;
         }
@@ -226,6 +269,10 @@ void Client::update()
         break;
     case LOBBY:
         this->lobbyWindow->update(this->mousePosView);
+        break;
+    case CREATEROOM:
+        this->createRoomWindow->update(this->mousePosView);
+        break;
     default:
         break;
     }
@@ -255,6 +302,9 @@ void Client::render()
 
     case LOBBY:
         this->lobbyWindow->drawTo(*this->window);
+        break;
+    case CREATEROOM:
+        this->createRoomWindow->drawTo(*this->window);
         break;
     default:
         break;
@@ -326,6 +376,18 @@ void Client::rp_logout() {
     } else {
         this->notification->setText("Logout Fail!!", 50, rp.notification, 30);
         this->next_state = LOBBY;
+    }
+}
+
+void Client::rp_createRoom() {
+    struct rp_create_room rp = message_to_rp_create_room(this->buff);
+    ///////////////////////////////////////////////////////////////
+    if (rp.accept) {
+        this->notification->setText("Create Room Success!!", 50, "", 0);
+        this->next_state = LOBBY; ///////
+    } else {
+        this->notification->setText("Create Room Fail!!", 50, rp.notification, 30);
+        this->next_state = LOBBY; ////////////
     }
 }
 

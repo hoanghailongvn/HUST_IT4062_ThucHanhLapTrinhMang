@@ -19,6 +19,7 @@
 #include "../include/LoginWindow.h"
 #include "../include/Notification.h"
 #include "../include/LobbyWindow.h"
+#include "../include/CreateRoomWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -29,6 +30,7 @@ enum StateTypes
     REGISTER,
     LOGIN,
     LOBBY,
+    CREATEROOM,
     ROOM,
     PLAY,
     NOTIFICATION,
@@ -63,6 +65,7 @@ private:
     LoginWindow *loginWindow;
     LobbyWindow *lobbyWindow;
     Notification *notification;
+    CreateRoomWindow *createRoomWindow;
 
 
     void initNetwork();
@@ -73,6 +76,7 @@ private:
     void initLoginWindow();
     void initLobbyWindow();
     void initNotification();
+    void initCreateRoomWindow();
     void initFont();
 
 public:
@@ -95,6 +99,7 @@ public:
     void rp_register();
     void rp_login();
     void rp_logout();
+    void rp_createRoom();
 
     void closeSocket();
 };
