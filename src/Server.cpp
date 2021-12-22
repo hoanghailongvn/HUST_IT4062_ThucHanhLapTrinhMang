@@ -88,6 +88,8 @@ void Server::run()
             }
             close(connfd);
             exit(0);
+        } else if (this->pid > 0) {
+            cout << "Parrent!!" << endl;
         }
 
         close(connfd);

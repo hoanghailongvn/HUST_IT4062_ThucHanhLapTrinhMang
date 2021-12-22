@@ -27,6 +27,7 @@ private:
     char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
     pid_t pid;
+    
 
 
 public:
