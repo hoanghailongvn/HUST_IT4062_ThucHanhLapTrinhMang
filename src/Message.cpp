@@ -24,6 +24,14 @@ void struct_to_message(void *p, MessageType type, char *output) {
     const char *res;
     switch (type)
     {
+    case RQ_EXIT:
+    {
+        auto *struct_obj = (rq_exit *)p;
+        final << struct_obj->type << "\0";
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     case RQ_REGISTER: 
     {
         auto *struct_obj = (rq_register *)p;

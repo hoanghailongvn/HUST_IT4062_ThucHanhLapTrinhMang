@@ -16,19 +16,19 @@
 #include <netdb.h> //dns
 #include <unistd.h> //close, fork
 #include <sys/wait.h> //waitpid
+#include <pthread.h>
 
-void sig_chld(int signo);
+void* routine(void *);
 
 class Server {
 private:
-    std::vector<User *> listUser;
-    std::vector<Room *> listRoom;
     int listenfd;
-    char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
-    pid_t pid;
-    
 
+    static std::vector<User *> listUser;
+    static std::vector<Room *> listRoom;
+
+    std::vector<pthread_t> threads;
 
 public:
     Server();
@@ -36,14 +36,20 @@ public:
 
     void run();
 
-    void rq_register();
-    void rq_login(struct sockaddr_in *clientAddr, User *&clientUser);
-    void rq_logout(User *&clientUser);
-    void rq_createRoom(User *&clientUser);
+    static void rq_register(char *rq_register, char *rp_register);
+    static void rq_login(char *rq_login, char *rp_login, int connfd, User *&clientUser);
+    static void rq_logout(char *rq_logout, char *rp_logout, User *&clientUser);
+    static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser);
 
-    void rcvFromClient(int connfd, struct sockaddr_in clientAddr);
-    void sendToClient(int connfd, struct sockaddr_in clientAddr);
+    static void rcvFromClient(int connfd, char *rcv_message);
+    static void sendToClient(int connfd, char *send_message);
     void loadUserData(std::string path);
+
+    static void* routine(void *);
 };
+
+std::vector<User *> Server::listUser;
+std::vector<Room *> Server::listRoom;
+
 
 #endif

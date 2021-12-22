@@ -45,7 +45,6 @@ bool LobbyWindow::logoutPressed(char *message) {
     if (this->logout_btn->isPressed()) {
         rq_logout rq;
         struct_to_message(&rq, RQ_LOGOUT, message);
-
         return true;
     }
     return false;

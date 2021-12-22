@@ -74,9 +74,11 @@ Client::Client()
 Client::~Client()
 {
     delete this->window;
+    delete this->font;
     delete this->introWindow;
     delete this->registerWindow;
-    delete this->font;
+    delete this->loginWindow;
+    delete this->lobbyWindow;
     delete this->notification;
 }
 
@@ -90,7 +92,11 @@ void Client::pollEvents()
     // Event polling
     while (this->window->pollEvent(this->ev)) {
         if (this->ev.type == sf::Event::Closed) {
+            rq_exit temp;
+            struct_to_message(&temp, RQ_EXIT, this->buff);
+            this->sendToServer();
             this->window->close();
+            exit(0);
             continue;
         }
 
@@ -273,6 +279,7 @@ void Client::sendToServer()
         perror("Error: ");
         exit(1);
     }
+    cout << "\nSend: " << "\n{\n" << this->buff << "\n}\n";
 }
 void Client::rcvFromServer() {
     int ret;

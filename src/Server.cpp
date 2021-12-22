@@ -34,18 +34,22 @@ Server::Server()
 
 Server::~Server()
 {
-    for (auto user : this->listUser) {
+    for (auto user : Server::listUser) {
         delete user;
+
     }
-    this->listUser.clear();
+    Server::listUser.clear();
+    for (auto room : Server::listRoom) {
+        delete room;
+    }
+    Server::listRoom.clear();
 }
 
 void Server::run()
 {
     struct sockaddr_in clientAddr;
-    socklen_t clientAddrLen = sizeof(clientAddr);
-    signal(SIGCHLD, sig_chld);
     int connfd;
+    socklen_t clientAddrLen = sizeof(struct sockaddr_in);
 
     while (1) {
         // Accept request
@@ -54,46 +58,18 @@ void Server::run()
             perror("Error");
             exit(1);
         }
-        this->pid = fork();
-        cout << "Pid" << this->pid << endl;
-        if (this->pid == 0) {
-            close(this->listenfd);
-            printf("You got a connection from port %d\n", ntohs(clientAddr.sin_port));
-            User *clientUser = nullptr;
-            while (1) {
-                this->rcvFromClient(connfd, clientAddr);
-                switch (getCode(this->buff)) {
-                case RQ_REGISTER:
-                    this->rq_register();
-                    this->sendToClient(connfd, clientAddr);
-                    break;
-                
-                case RQ_LOGIN:
-                    this->rq_login(&clientAddr, clientUser);
-                    this->sendToClient(connfd, clientAddr);
-                    break;
-
-                case RQ_LOGOUT:
-                    this->rq_logout(clientUser);
-                    this->sendToClient(connfd, clientAddr);
-                    break;
-
-                case RQ_CREATE_ROOM:
-                    this->rq_createRoom(clientUser);
-                    this->sendToClient(connfd, clientAddr);
-                    break;
-                default:
-                    break;
-                }
-            }
-            close(connfd);
-            exit(0);
-        } else if (this->pid > 0) {
-            cout << "Parrent!!" << endl;
+        cout << "\nGet connection from " << ntohs(clientAddr.sin_port) << "\n";
+        pthread_t new_thread;
+        if (pthread_create(&new_thread, nullptr, routine, &connfd) < 0) {
+            perror("Could not create thread:");
+            exit(1);
         }
-
-        close(connfd);
+        this->threads.push_back(new_thread);
+        
     }
+    for (auto thread: this->threads) {
+            pthread_join(thread, nullptr);
+        }
     close(this->listenfd);
 }
 
@@ -108,26 +84,18 @@ void Server::loadUserData(string path)
         string password = line.substr(line.find(delimiter) + 1, line.length());
 
         User* user = new User(username, password);
-        this->listUser.push_back(user);
+        Server::listUser.push_back(user);
     }
     ReadFile.close();
 }
 
-void sig_chld(int sig_no)
+void Server::rq_register(char *rq_register, char *rp_register)
 {
-    pid_t pid;
-    int stat;
-    pid = waitpid(-1, &stat, WNOHANG);
-    printf("child %d terminated\n", pid);
-}
-
-void Server::rq_register()
-{
-    struct rq_register rq = message_to_rq_register(this->buff);
+    struct rq_register rq = message_to_rq_register(rq_register);
     struct rp_register rp;
 
     bool check = true;
-    for (auto user : this->listUser) {
+    for (auto user : Server::listUser) {
         if (user->getUsername().compare(rq.username) == 0) {
             rp.accept = false;
             rp.notification = "User existed!!";
@@ -139,24 +107,24 @@ void Server::rq_register()
         rp.accept = true;
 
         User* u = new User(rq.username, rq.password);
-        this->listUser.push_back(u);
+        Server::listUser.push_back(u);
 
         ofstream WriteFile;
         WriteFile.open(userDataPath, std::ios_base::app);
         WriteFile << rq.username << " " << rq.password << "\n";
     }
     
-    struct_to_message(&rp, RP_REGISTER, this->buff);
+    struct_to_message(&rp, RP_REGISTER, rp_register);
 
 }
 
-void Server::rq_login(struct sockaddr_in *clientAddr, User *&clientUser) {
-    struct rq_login rq = message_to_rq_login(this->buff);
+void Server::rq_login(char *rq_login, char *rp_login, int connfd, User *&clientUser) {
+    struct rq_login rq = message_to_rq_login(rq_login);
     struct rp_login rp;
 
     bool check = false;
     User *target = nullptr;
-    for (auto user:this->listUser) {
+    for (auto user:Server::listUser) {
         if (user->getUsername().compare(rq.username) == 0) {
             check = true;
             target = user;
@@ -181,46 +149,43 @@ void Server::rq_login(struct sockaddr_in *clientAddr, User *&clientUser) {
     }
     
     if (rp.accept) {
-        target->setClientAddr(clientAddr);
+        target->setConnfd(connfd);
         target->setState(ONLINE);
         clientUser = target;
         rp.username = target->getUsername();
     }
-    struct_to_message(&rp, RP_LOGIN, this->buff);
+    struct_to_message(&rp, RP_LOGIN, rp_login);
 }
 
-void Server::rq_logout(User *&clientUser) {
-    cout << clientUser->getUsername() << endl;
-    struct rq_logout rq = message_to_rq_logout(this->buff);
+void Server::rq_logout(char *rq_logout, char *rp_logout, User *&clientUser) {
+    struct rq_logout rq = message_to_rq_logout(rq_logout);
     struct rp_logout rp;
 
     clientUser->setState(OFFLINE);
     rp.accept = true;
     
-    struct_to_message(&rp, RP_LOGOUT, this->buff);
-    
-    cout << this->buff << endl;
+    struct_to_message(&rp, RP_LOGOUT, rp_logout);
 }
 
-void Server::rq_createRoom(User *&clientUser) {
-    rq_create_room rq = message_to_rq_create_room(this->buff);
+void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser) {
+    rq_create_room rq = message_to_rq_create_room(rq_createRoom);
     rp_create_room rp;
 
-    if(this->listRoom.size() < MAX_ROOM) {
+    if(Server::listRoom.size() < MAX_ROOM) {
         Room *newRoom = new Room(rq.name, clientUser);
-
+        Server::listRoom.push_back(newRoom);
         rp.accept = true;
     } else {
         rp.accept = false;
         rp.notification = "Reach Max Room";
     }
     
-    struct_to_message(&rp, RP_CREATE_ROOM, this->buff);
+    struct_to_message(&rp, RP_CREATE_ROOM, rp_createRoom);
 }
 
 
-void Server::rcvFromClient(int connfd, struct sockaddr_in clientAddr) {
-    int rcvBytes = recv(connfd, this->buff, BUFF_SIZE, 0);
+void Server::rcvFromClient(int connfd, char *rcv_message) {
+    int rcvBytes = recv(connfd, rcv_message, BUFF_SIZE, 0);
     if (rcvBytes < 0) {
         perror("Error");
     }
@@ -228,15 +193,55 @@ void Server::rcvFromClient(int connfd, struct sockaddr_in clientAddr) {
         close(connfd);
         exit(0);
     }
-    this->buff[rcvBytes] = '\0';
+    rcv_message[rcvBytes] = '\0';
 
-    cout << "\nReceive from " << ntohs(clientAddr.sin_port) << "\n{\n" << this->buff << "\n}\n";
+    cout << "\nReceive: " << "\n{\n" << rcv_message << "\n}\n";
 }
 
-void Server::sendToClient(int connfd, struct sockaddr_in clientAddr) {
-    int sendBytes = send(connfd, this->buff, strlen(this->buff), 0);
+void Server::sendToClient(int connfd, char *send_message) {
+    int sendBytes = send(connfd, send_message, strlen(send_message), 0);
     if(sendBytes < 0) {
         perror("Error");
     }
-    cout << "\nSend to " << ntohs(clientAddr.sin_port) << "\n{\n" << this->buff << "\n}\n";
+}
+
+void* Server::routine(void *client_socket) {
+    int connfd = *(int *)client_socket;
+    
+    User *clientUser = nullptr;
+    char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
+    
+    bool exit_check = false;
+    while (!exit_check) {
+        Server::rcvFromClient(connfd, rcv_message);
+        switch (getCode(rcv_message)) {
+        case RQ_EXIT:
+            exit_check = true;
+            break;
+        case RQ_REGISTER:
+            Server::rq_register(rcv_message, send_message);
+            Server::sendToClient(connfd, send_message);
+            break;
+        
+        case RQ_LOGIN:
+            Server::rq_login(rcv_message, send_message, connfd, clientUser);
+            Server::sendToClient(connfd, send_message);
+            break;
+
+        case RQ_LOGOUT:
+            Server::rq_logout(rcv_message, send_message, clientUser);
+            Server::sendToClient(connfd, send_message);
+            break;
+
+        case RQ_CREATE_ROOM:
+            Server::rq_createRoom(rcv_message, send_message, clientUser);
+            Server::sendToClient(connfd, send_message);
+            break;
+        default:
+            break;
+        }
+    }
+    close(connfd);
+
+    return nullptr;
 }

@@ -12,14 +12,13 @@ private:
     std::string username;
     std::string password;
 
-    struct sockaddr_in *clientAddr;
+    int connfd;
 public:
     User(std::string username, std::string password);
     ~User();
 
-
     std::string getUsername();
-    void setClientAddr(struct sockaddr_in *input);
+    void setConnfd(int connfd);
     bool checkPassword(std::string input);
     bool isOnline();
     bool isOffline();

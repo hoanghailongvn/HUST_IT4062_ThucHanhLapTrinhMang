@@ -7,22 +7,12 @@
 #include <iostream>
 #include <vector>
 
-/*
-    Message mình truyền đi ở dạng char[]
-    Mình phải chuyển message dạng char[] sang dạng struct cho dễ xử lý hơn
-    Cần viết các hàm convert giữa 2 dạng này
-
-    Viết thêm struct message
-    Viết hàm convert giữa 2 kiểu tương ứng với messag mới
-    
-    Chuyển từ struct sang message thì dùng một hàm struct_to_message thôi
-    Nhưng chuyển từ message sang struct thì phải viets nhiều hàm do còn phụ thuộc vào kiểu trả về là struct nào
-
-*/
-
-// Nghĩ thêm các loại message rồi cho vô enum
-enum MessageType {RQ_REGISTER = 0, RP_REGISTER, RQ_LOGIN, RP_LOGIN, RQ_LOGOUT, RP_LOGOUT, RQ_CREATE_ROOM, RP_CREATE_ROOM, RQ_JOIN_ROOM, RP_JOIN_ROOM,
+enum MessageType {RQ_EXIT = 0, RQ_REGISTER, RP_REGISTER, RQ_LOGIN, RP_LOGIN, RQ_LOGOUT, RP_LOGOUT, RQ_CREATE_ROOM, RP_CREATE_ROOM, RQ_JOIN_ROOM, RP_JOIN_ROOM,
 RQ_UPDATE_LOBBY, RP_UPDATE_LOBBY};
+
+struct rq_exit {
+    MessageType type = RQ_EXIT;
+};
 
 struct rq_register {
     MessageType type = RQ_REGISTER;

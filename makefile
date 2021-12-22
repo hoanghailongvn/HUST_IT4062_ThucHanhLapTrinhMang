@@ -16,7 +16,7 @@ rm = rm -f
 all: $(BINDIR)/server $(BINDIR)/client $(BINDIR)/sfml
 
 $(BINDIR)/server: $(OBJDIR)/server.o $(OBJDIR)/Server.o $(OBJDIR)/User.o $(OBJDIR)/Message.o $(OBJDIR)/Room.o
-	$(CXX) $^ -o $@
+	$(CXX) $^ -o $@ -pthread
 
 $(BINDIR)/client: $(OBJDIR)/client.o $(OBJDIR)/Client.o $(OBJDIR)/Message.o $(OBJDIR)/Textbox.o $(OBJDIR)/Button.o $(OBJDIR)/IntroWindow.o $(OBJDIR)/RegisterWindow.o $(OBJDIR)/LoginWindow.o $(OBJDIR)/Notification.o $(OBJDIR)/LobbyWindow.o $(OBJDIR)/Room.o
 	$(CXX) $^ $(LDFLAGS) -o $@
