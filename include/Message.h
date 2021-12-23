@@ -7,8 +7,13 @@
 #include <iostream>
 #include <vector>
 
-enum MessageType {RQ_EXIT = 0, RQ_REGISTER, RP_REGISTER, RQ_LOGIN, RP_LOGIN, RQ_LOGOUT, RP_LOGOUT, RQ_CREATE_ROOM, RP_CREATE_ROOM, RQ_JOIN_ROOM, RP_JOIN_ROOM,
-RQ_UPDATE_LOBBY, RP_UPDATE_LOBBY};
+enum MessageType {RQ_EXIT = 0, RQ_REGISTER, RP_REGISTER, 
+RQ_LOGIN, RP_LOGIN, 
+RQ_LOGOUT, RP_LOGOUT, 
+RQ_CREATE_ROOM, RP_CREATE_ROOM, 
+RQ_JOIN_ROOM, RP_JOIN_ROOM,
+RQ_UPDATE_LOBBY, RP_UPDATE_LOBBY,
+RQ_EXIT_ROOM};
 
 struct rq_exit {
     MessageType type = RQ_EXIT;
@@ -57,6 +62,7 @@ struct rp_create_room {
     MessageType type = RP_CREATE_ROOM;
     bool accept;
     std::string notification = " ";
+    std::string roomname = " ";
 };
 
 struct rq_join_room {
@@ -76,6 +82,10 @@ struct rq_update_lobby{
 
 struct rp_update_lobby{
     MessageType type = RP_UPDATE_LOBBY;
+};
+
+struct rq_exit_room {
+    MessageType type = RQ_EXIT_ROOM;
 };
 
 void struct_to_message(void *p, MessageType type, char *output);

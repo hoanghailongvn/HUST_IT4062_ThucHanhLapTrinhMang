@@ -6,18 +6,22 @@
 #include <string>
 
 class Room {
-    private:
+    protected:
     std::string name;
-    User *host;
-    std::vector<User *> listMember;
+    std::vector<std::string> listUser;
+    std::vector<bool> ready;
+    void setup(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
 
     public:
-    Room(std::string name, User *host);
+    Room();
+    Room(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
     ~Room();
 
-    int getNumberMember();
-
-
+    int getNumberUser();
+    std::string getHost();
+    std::string getName();
+    void setReady(int stand, bool ready);
+    void removeUser(std::string user);
 };
 
 #endif

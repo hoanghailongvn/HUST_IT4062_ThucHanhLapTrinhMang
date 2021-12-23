@@ -113,7 +113,8 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rp_create_room *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
-        final << struct_obj->notification << "\0";
+        final << struct_obj->notification << "\n";
+        final << struct_obj->roomname << "\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -156,6 +157,15 @@ void struct_to_message(void *p, MessageType type, char *output) {
         final << struct_obj->type << "\n";
         // final << struct_obj->accept << "\n";
         // final << struct_obj->notification << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
+    case RQ_EXIT_ROOM:
+    {
+        auto *struct_obj = (rq_exit_room *)p;
+        final << struct_obj->type << "\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -269,6 +279,7 @@ rp_create_room message_to_rp_create_room(char *message) {
         res.notification = splited_line.at(2);
     } else {
         res.notification = "";
+        res.roomname = splited_line.at(3);
     }
 
     return res;

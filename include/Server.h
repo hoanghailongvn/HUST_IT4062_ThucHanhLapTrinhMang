@@ -39,7 +39,8 @@ public:
     static void rq_register(char *rq_register, char *rp_register);
     static void rq_login(char *rq_login, char *rp_login, int connfd, User *&clientUser);
     static void rq_logout(char *rq_logout, char *rp_logout, User *&clientUser);
-    static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser);
+    static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser, Room *&clientRoom);
+    static void rq_exitRoom(char *rq_exitRoom, User *&clientUser, Room *&clientRoom);
 
     static void rcvFromClient(int connfd, char *rcv_message);
     static void sendToClient(int connfd, char *send_message);

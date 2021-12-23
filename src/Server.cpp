@@ -170,20 +170,48 @@ void Server::rq_logout(char *rq_logout, char *rp_logout, User *&clientUser) {
     struct_to_message(&rp, RP_LOGOUT, rp_logout);
 }
 
-void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser) {
+void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, User *&clientUser, Room *&clientRoom) {
     rq_create_room rq = message_to_rq_create_room(rq_createRoom);
     rp_create_room rp;
-
+    
     if(Server::listRoom.size() < MAX_ROOM) {
-        Room *newRoom = new Room(rq.name, clientUser);
-        Server::listRoom.push_back(newRoom);
-        rp.accept = true;
+        bool check = true;
+        for(auto room: Server::listRoom) {
+            if (room->getName().compare(rq.name) == 0) {
+                check = false;
+                rp.accept = false;
+                rp.notification = "Room name existed!!";
+                break;
+            }
+        }
+
+        if (check) {
+            Room *newRoom = new Room(rq.name, vector<string>{clientUser->getUsername()}, vector<bool>{false});
+            Server::listRoom.push_back(newRoom);
+            clientRoom = newRoom;
+            rp.accept = true;
+            rp.roomname = rq.name;
+        }
+        
     } else {
         rp.accept = false;
         rp.notification = "Reach Max Room";
     }
-    
     struct_to_message(&rp, RP_CREATE_ROOM, rp_createRoom);
+}
+
+void Server::rq_exitRoom(char *rq_exitRoom, User *&clientUser, Room *&clientRoom) {
+    if(clientRoom->getNumberUser() == 1) {
+        for (int i = 0; i < Server::listRoom.size(); i++) {
+            if (Server::listRoom.at(i) == clientRoom) {
+                Server::listRoom.erase(Server::listRoom.begin() + i);
+                break;
+            }
+        }
+    } else {
+        clientRoom->removeUser(clientUser->getUsername());
+    }
+    clientRoom = nullptr;
 }
 
 
@@ -206,12 +234,15 @@ void Server::sendToClient(int connfd, char *send_message) {
     if(sendBytes < 0) {
         perror("Error");
     }
+
+    cout << "\nSend: " << "\n{\n" << send_message << "\n}\n";
 }
 
 void* Server::routine(void *client_socket) {
     int connfd = *(int *)client_socket;
     
     User *clientUser = nullptr;
+    Room *clientRoom = nullptr;
     char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
     
     bool exit_check = false;
@@ -220,7 +251,9 @@ void* Server::routine(void *client_socket) {
         switch (getCode(rcv_message)) {
         case RQ_EXIT:
             exit_check = true;
-            clientUser->setState(OFFLINE);
+            if(clientUser != nullptr) {
+                clientUser->setState(OFFLINE);
+            }
             break;
         case RQ_REGISTER:
             Server::rq_register(rcv_message, send_message);
@@ -230,16 +263,22 @@ void* Server::routine(void *client_socket) {
         case RQ_LOGIN:
             Server::rq_login(rcv_message, send_message, connfd, clientUser);
             Server::sendToClient(connfd, send_message);
+            cout << clientUser << endl;
             break;
 
         case RQ_LOGOUT:
             Server::rq_logout(rcv_message, send_message, clientUser);
             Server::sendToClient(connfd, send_message);
+            cout << clientUser << endl;
             break;
 
         case RQ_CREATE_ROOM:
-            Server::rq_createRoom(rcv_message, send_message, clientUser);
+            Server::rq_createRoom(rcv_message, send_message, clientUser, clientRoom);
             Server::sendToClient(connfd, send_message);
+            break;
+
+        case RQ_EXIT_ROOM:
+            Server::rq_exitRoom(rcv_message, clientUser, clientRoom);
             break;
         default:
             break;

@@ -54,6 +54,10 @@ void Client::initCreateRoomWindow() {
     this->createRoomWindow = new CreateRoomWindow(this->font);
 }
 
+void Client::initRoomWindow() {
+    this->roomWindow = new RoomWindow(this->font);
+}
+
 void Client::initFont()
 {
     this->font = new sf::Font();
@@ -74,6 +78,7 @@ Client::Client()
     this->initLobbyWindow();
     this->initNotification();
     this->initCreateRoomWindow();
+    this->initRoomWindow();
 }
 
 Client::~Client()
@@ -232,13 +237,24 @@ void Client::pollEvents()
                         this->rp_createRoom();
                     } else if (fail_type == 1) {
                         this->notification->setText("Create Room Fail!!", 50, "Empty field.", 30);
+                        this->state = NOTIFICATION;
                         this->next_state = CREATEROOM;
                     }
-                    this->state = NOTIFICATION;
                 }
                 break;
             }
             break;
+        case ROOM:
+            switch (ev.type)
+            {
+            case sf::Event::MouseButtonPressed:
+                if (this->roomWindow->backPressed(this->buff)) {
+                    this->sendToServer();
+                    this->state = LOBBY;
+                }
+
+                break;
+            }
         default:
             break;
         }
@@ -273,6 +289,9 @@ void Client::update()
     case CREATEROOM:
         this->createRoomWindow->update(this->mousePosView);
         break;
+    case ROOM:
+        this->roomWindow->update(this->mousePosView);
+        break;
     default:
         break;
     }
@@ -305,6 +324,9 @@ void Client::render()
         break;
     case CREATEROOM:
         this->createRoomWindow->drawTo(*this->window);
+        break;
+    case ROOM:
+        this->roomWindow->drawTo(*this->window);
         break;
     default:
         break;
@@ -339,6 +361,7 @@ void Client::rcvFromServer() {
         exit(1);
     }
     this->buff[ret] = '\0';
+    cout << "\nReceiv: " << "\n{\n" << this->buff << "\n}\n";
 }
 
 void Client::rp_register()
@@ -381,13 +404,14 @@ void Client::rp_logout() {
 
 void Client::rp_createRoom() {
     struct rp_create_room rp = message_to_rp_create_room(this->buff);
-    ///////////////////////////////////////////////////////////////
     if (rp.accept) {
-        this->notification->setText("Create Room Success!!", 50, "", 0);
-        this->next_state = LOBBY; ///////
+        this->state = ROOM;
+        this->roomWindow->setupWindow(rp.roomname, vector<string>{this->userName}, vector<bool>{false});
+
     } else {
         this->notification->setText("Create Room Fail!!", 50, rp.notification, 30);
-        this->next_state = LOBBY; ////////////
+        this->state = NOTIFICATION;
+        this->next_state = LOBBY;
     }
 }
 

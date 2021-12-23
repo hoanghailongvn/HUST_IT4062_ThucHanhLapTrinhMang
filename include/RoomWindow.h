@@ -6,26 +6,33 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "GameConfig.h"
 #include "Button.h"
 #include "Textbox.h"
 #include "Message.h"
+#include "UserBox.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-class RoomWindow {
+class RoomWindow : public Room {
 private:
-    Room room;
-    Button *back_btn, *ready_start_btn;
-    
+    Button *back_btn, *ready_btn, *start_btn;
+    std::vector <UserBox *> userBoxList;
+    sf::Font *font;
+    sf::Text *main;
 
 public:
-    RoomWindow();
+    RoomWindow(sf::Font *font);
     ~RoomWindow();
+
+    void setupWindow(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
 
     void update(sf::Vector2f mousePos);
     void drawTo(sf::RenderTarget &target);
+
+    bool backPressed(char *message);
 
 };
 

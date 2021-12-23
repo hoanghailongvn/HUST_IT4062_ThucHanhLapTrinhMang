@@ -20,6 +20,7 @@
 #include "../include/Notification.h"
 #include "../include/LobbyWindow.h"
 #include "../include/CreateRoomWindow.h"
+#include "../include/RoomWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -66,6 +67,7 @@ private:
     LobbyWindow *lobbyWindow;
     Notification *notification;
     CreateRoomWindow *createRoomWindow;
+    RoomWindow *roomWindow;
 
 
     void initNetwork();
@@ -77,6 +79,7 @@ private:
     void initLobbyWindow();
     void initNotification();
     void initCreateRoomWindow();
+    void initRoomWindow();
     void initFont();
 
 public:
