@@ -23,3 +23,6 @@ $(BINDIR)/client: $(OBJDIR)/client.o $(OBJDIR)/Client.o $(OBJDIR)/Message.o $(OB
 
 $(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $< -o $@
+
+clear:
+	rm -f $(OBJECTS)

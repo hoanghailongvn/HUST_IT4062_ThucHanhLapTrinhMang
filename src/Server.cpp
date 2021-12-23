@@ -2,6 +2,9 @@
 
 using namespace std;
 
+std::vector<User *> Server::listUser;
+std::vector<Room *> Server::listRoom;
+
 Server::Server()
 {
     this->loadUserData(userDataPath);

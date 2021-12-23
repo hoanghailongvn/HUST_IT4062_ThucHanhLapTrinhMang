@@ -48,8 +48,5 @@ public:
     static void* routine(void *);
 };
 
-std::vector<User *> Server::listUser;
-std::vector<Room *> Server::listRoom;
-
 
 #endif
