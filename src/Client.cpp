@@ -5,6 +5,7 @@ using namespace std;
 void Client::initNetwork()
 {
     this->clientfd = socket(AF_INET, SOCK_STREAM, 0);
+    this->listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
     bzero(&this->servAddr, sizeof(this->servAddr));
     this->servAddr.sin_family = AF_INET;
@@ -418,4 +419,5 @@ void Client::rp_createRoom() {
 void Client::closeSocket()
 {
     close(this->clientfd);
+    close(this->listenfd);
 }

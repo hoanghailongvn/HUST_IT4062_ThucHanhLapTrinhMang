@@ -41,7 +41,7 @@ class Client {
 private: 
 
     //Network
-    int clientfd;
+    int clientfd, listenfd;
     char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
 
