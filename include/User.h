@@ -11,14 +11,11 @@ private:
     State state;
     std::string username;
     std::string password;
-
-    int connfd;
 public:
     User(std::string username, std::string password);
     ~User();
 
     std::string getUsername();
-    void setConnfd(int connfd);
     bool checkPassword(std::string input);
     bool isOnline();
     bool isOffline();

@@ -56,6 +56,15 @@ bool LobbyWindow::logoutPressed(char *message) {
     return false;
 }
 
+bool LobbyWindow::joinPressed(char *message) {
+    if (this->joinRoom_btn->isPressed()) {
+        rq_join_room rq;
+        struct_to_message(&rq, RQ_JOIN_ROOM, message);
+        return true;
+    }
+    return false;
+}
+
 bool LobbyWindow::createRoomPressed() {
     if (this->createRoom_btn->isPressed()) {
         return true;

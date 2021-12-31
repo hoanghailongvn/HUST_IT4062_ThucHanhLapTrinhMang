@@ -20,7 +20,9 @@
 #include "../include/Notification.h"
 #include "../include/LobbyWindow.h"
 #include "../include/CreateRoomWindow.h"
+#include "../include/JoinWindow.h"
 #include "../include/RoomWindow.h"
+#include "../include/UserClient.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -32,6 +34,7 @@ enum StateTypes
     LOGIN,
     LOBBY,
     CREATEROOM,
+    JOIN,
     ROOM,
     PLAY,
     NOTIFICATION,
@@ -42,10 +45,9 @@ private:
 
     //Network
     int clientfd, listenfd;
-    char buff[BUFF_SIZE + 1];
     struct sockaddr_in servAddr;
 
-    std::string userName;
+    UserClient *userClient;
     // Variables
 
     // Window
@@ -67,6 +69,7 @@ private:
     LobbyWindow *lobbyWindow;
     Notification *notification;
     CreateRoomWindow *createRoomWindow;
+    JoinWindow *joinWindow;
     RoomWindow *roomWindow;
 
 
@@ -79,6 +82,7 @@ private:
     void initLobbyWindow();
     void initNotification();
     void initCreateRoomWindow();
+    void initJoinWindow();
     void initRoomWindow();
     void initFont();
 
@@ -94,17 +98,18 @@ public:
     void render();
 
     //Network
-    void communicate();
     void run();
-    void sendToServer();
-    void rcvFromServer();
+    void sendToServer(int fd, char *buff);
+    void rcvFromServer(int fd, char *buff);
 
-    void rp_register();
-    void rp_login();
-    void rp_logout();
-    void rp_createRoom();
+    void rp_register(char *rq_message);
+    void rp_login(char *rq_message);
+    void rp_logout(char *rq_message);
+    void rp_createRoom(char *rq_message);
+    void rp_joinRoom(char *rq_message);
 
-    void closeSocket();
+    static void* routine1(void *);
+    static void* routine2(void *); 
 };
 
 #endif

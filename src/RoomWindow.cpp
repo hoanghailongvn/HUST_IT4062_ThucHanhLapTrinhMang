@@ -34,7 +34,7 @@ RoomWindow::~RoomWindow() {
     }
 }
 
-void RoomWindow::setupWindow(std::string name, std::vector<std::string> listUser, std::vector<bool> ready) {
+void RoomWindow::setupWindow(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready) {
     this->main->setString("Room: " + name);
     this->setup(name, listUser, ready);
     for (int i = 0; i < listUser.size(); i++) {

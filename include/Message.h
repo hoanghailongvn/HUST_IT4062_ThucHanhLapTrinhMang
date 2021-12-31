@@ -67,7 +67,7 @@ struct rp_create_room {
 
 struct rq_join_room {
     MessageType type = RQ_JOIN_ROOM;
-    std::string id;
+    std::string room_name;
 };
 
 struct rp_join_room {

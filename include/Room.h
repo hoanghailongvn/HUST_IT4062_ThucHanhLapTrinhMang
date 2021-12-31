@@ -5,23 +5,25 @@
 #include <vector>
 #include <string>
 
+class UserClient;
+
 class Room {
     protected:
     std::string name;
-    std::vector<std::string> listUser;
+    std::vector<UserClient *> listUser;
     std::vector<bool> ready;
-    void setup(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
+    void setup(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
 
     public:
     Room();
-    Room(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
+    Room(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
     ~Room();
 
     int getNumberUser();
-    std::string getHost();
+    UserClient* getHost();
     std::string getName();
     void setReady(int stand, bool ready);
-    void removeUser(std::string user);
+    void removeUser(UserClient *);
 };
 
 #endif

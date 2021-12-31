@@ -12,6 +12,7 @@
 #include "Textbox.h"
 #include "Message.h"
 #include "UserBox.h"
+#include "UserClient.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -27,7 +28,7 @@ public:
     RoomWindow(sf::Font *font);
     ~RoomWindow();
 
-    void setupWindow(std::string name, std::vector<std::string> listUser, std::vector<bool> ready);
+    void setupWindow(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
 
     void update(sf::Vector2f mousePos);
     void drawTo(sf::RenderTarget &target);

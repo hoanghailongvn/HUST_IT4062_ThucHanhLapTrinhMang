@@ -10,6 +10,7 @@
 #include "Button.h"
 #include "Textbox.h"
 #include "Message.h"
+#include "UserClient.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -19,7 +20,7 @@ private:
     sf::RectangleShape shape;
     sf::CircleShape circle_shape;
     sf::Text username;
-    std::string username_string;
+    UserClient *userClient;
     sf::Font *font;
 
     bool ready;
@@ -28,7 +29,7 @@ public:
     UserBox(float x, float y, float width, float height, sf::Font *font, sf::Color userColor);
     ~UserBox();
 
-    void setup(std::string username, bool ready);
+    void setup(UserClient *userClient, bool ready);
 
     void update(sf::Vector2f mousePos);
     void drawTo(sf::RenderTarget& target);

@@ -124,7 +124,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     {
         auto *struct_obj = (rq_join_room *)p;
         final << struct_obj->type << "\n";
-        final << struct_obj->id << "\0";
+        final << struct_obj->room_name << "\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -245,7 +245,7 @@ rp_logout message_to_rp_logout(char *message) {
 rq_join_room message_to_rq_join_room(char *message) {
     auto splited_line = split(message, "\n");
     rq_join_room res;
-    res.id = splited_line.at(1);
+    res.room_name = splited_line.at(1);
 
     return res;
 }

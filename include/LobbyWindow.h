@@ -33,6 +33,7 @@ public:
 
     // bool submitPressed(char *message, int *fail_type);
     bool logoutPressed(char *message);
+    bool joinPressed(char *message);
     bool createRoomPressed();
 };
 

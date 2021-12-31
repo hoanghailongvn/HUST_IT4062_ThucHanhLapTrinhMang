@@ -55,6 +55,10 @@ void Client::initCreateRoomWindow() {
     this->createRoomWindow = new CreateRoomWindow(this->font);
 }
 
+void Client::initJoinWindow() {
+    this->joinWindow = new JoinWindow(this->font);
+}
+
 void Client::initRoomWindow() {
     this->roomWindow = new RoomWindow(this->font);
 }
@@ -68,7 +72,6 @@ void Client::initFont()
 Client::Client()
 {
     this->initNetwork();
-    this->communicate();
 
     this->initFont();
     this->initVariables();
@@ -79,6 +82,7 @@ Client::Client()
     this->initLobbyWindow();
     this->initNotification();
     this->initCreateRoomWindow();
+    this->initJoinWindow();
     this->initRoomWindow();
 }
 
@@ -101,12 +105,17 @@ const bool Client::running() const
 
 void Client::pollEvents()
 {
+    char send_msg[BUFF_SIZE + 1];
+    char rcv_msg[BUFF_SIZE + 1];
+
     // Event polling
     while (this->window->pollEvent(this->ev)) {
         if (this->ev.type == sf::Event::Closed) {
             rq_exit temp;
-            struct_to_message(&temp, RQ_EXIT, this->buff);
-            this->sendToServer();
+            struct_to_message(&temp, RQ_EXIT, send_msg);
+            this->sendToServer(this->clientfd, send_msg);
+            
+            this->sendToServer(this->listenfd, send_msg);
             this->window->close();
             exit(0);
             continue;
@@ -141,12 +150,12 @@ void Client::pollEvents()
                     this->state = INTRO;
                 }
                 int fail_type;
-                if (registerWindow->submitPressed(this->buff, &fail_type)) {
+                if (registerWindow->submitPressed(send_msg, &fail_type)) {
                     switch (fail_type) {
                     case 0:
-                        this->sendToServer();
-                        this->rcvFromServer();
-                        this->rp_register();
+                        this->sendToServer(this->clientfd, send_msg);
+                        this->rcvFromServer(this->clientfd, rcv_msg);
+                        this->rp_register(rcv_msg);
                         break;
                     case 1:
                         this->notification->setText("Register Fail!!", 50, "Empty field", 30);
@@ -177,11 +186,11 @@ void Client::pollEvents()
                     this->state = INTRO;
                 }
                 int fail_type;
-                if (loginWindow->submitPressed(this->buff, &fail_type)) {
+                if (loginWindow->submitPressed(send_msg, &fail_type)) {
                     if(fail_type == 0) {
-                        this->sendToServer();
-                        this->rcvFromServer();
-                        this->rp_login();
+                        this->sendToServer(this->clientfd, send_msg);
+                        this->rcvFromServer(this->clientfd, rcv_msg);
+                        this->rp_login(rcv_msg);
                     } else if (fail_type == 1) {
                         this->notification->setText("Login Fail!!", 50, "Empty field.", 30);
                         this->next_state = LOGIN;
@@ -202,12 +211,16 @@ void Client::pollEvents()
             switch (ev.type)
             {
             case sf::Event::MouseButtonPressed:
-                if (this->lobbyWindow->logoutPressed(this->buff)) {
-                    this->sendToServer();
-                    this->rcvFromServer();
-                    this->rp_logout();
+                if (this->lobbyWindow->logoutPressed(send_msg)) {
+                    this->sendToServer(this->clientfd, send_msg);
+                    this->rcvFromServer(this->clientfd, rcv_msg);
+                    this->rp_logout(rcv_msg);
                     this->next_state = INTRO;
                     this->state = NOTIFICATION;
+                }
+                if (this->lobbyWindow->joinPressed(send_msg)) {
+                    this->joinWindow->refresh();
+                    this->state = JOIN;
                 }
                 if (this->lobbyWindow->createRoomPressed()) {
                     this->state = CREATEROOM;
@@ -231,13 +244,39 @@ void Client::pollEvents()
                     this->state = LOBBY;
                 }
                 int fail_type;
-                if (createRoomWindow->submitPressed(this->buff, &fail_type)) {
+                if (createRoomWindow->submitPressed(send_msg, &fail_type)) {
                     if(fail_type == 0) {
-                        this->sendToServer();
-                        this->rcvFromServer();
-                        this->rp_createRoom();
+                        this->sendToServer(this->clientfd, send_msg);
+                        this->rcvFromServer(this->clientfd, rcv_msg);
+                        this->rp_createRoom(rcv_msg);
                     } else if (fail_type == 1) {
                         this->notification->setText("Create Room Fail!!", 50, "Empty field.", 30);
+                        this->state = NOTIFICATION;
+                        this->next_state = CREATEROOM;
+                    }
+                }
+                break;
+            }
+            break;
+        case JOIN:
+            switch (ev.type)
+            {
+            case sf::Event::TextEntered:
+                this->joinWindow->typedOn(ev);
+                break;
+            
+            case sf::Event::MouseButtonPressed:
+                if (this->joinWindow->backPressed()) {
+                    this->state = LOBBY;
+                }
+                int fail_type;
+                if (joinWindow->submitPressed(send_msg, &fail_type)) {
+                    if(fail_type == 0) {
+                        this->sendToServer(this->clientfd, send_msg);
+                        this->rcvFromServer(this->clientfd, rcv_msg);
+                        this->rp_createRoom(rcv_msg);
+                    } else if (fail_type == 1) {
+                        this->notification->setText("Join Fail!!", 50, "Empty field.", 30);
                         this->state = NOTIFICATION;
                         this->next_state = CREATEROOM;
                     }
@@ -249,8 +288,8 @@ void Client::pollEvents()
             switch (ev.type)
             {
             case sf::Event::MouseButtonPressed:
-                if (this->roomWindow->backPressed(this->buff)) {
-                    this->sendToServer();
+                if (this->roomWindow->backPressed(send_msg)) {
+                    this->sendToServer(this->clientfd, send_msg);
                     this->state = LOBBY;
                 }
 
@@ -290,6 +329,9 @@ void Client::update()
     case CREATEROOM:
         this->createRoomWindow->update(this->mousePosView);
         break;
+    case JOIN:
+        this->joinWindow->update(this->mousePosView);
+        break;
     case ROOM:
         this->roomWindow->update(this->mousePosView);
         break;
@@ -326,6 +368,9 @@ void Client::render()
     case CREATEROOM:
         this->createRoomWindow->drawTo(*this->window);
         break;
+    case JOIN:
+        this->joinWindow->drawTo(*this->window);
+        break;
     case ROOM:
         this->roomWindow->drawTo(*this->window);
         break;
@@ -336,38 +381,30 @@ void Client::render()
     this->window->display();
 }
 
-void Client::communicate()
-{
-    if (connect(this->clientfd, (sockaddr*)&this->servAddr, sizeof(this->servAddr))) {
-        perror("Error: ");
-        exit(1);
-    }
-}
-
-void Client::sendToServer()
+void Client::sendToServer(int fd, char *buff)
 {
     int ret;
-    ret = send(this->clientfd, this->buff, strlen(this->buff), 0);
+    ret = send(fd, buff, strlen(buff), 0);
     if (ret < 0) {
         perror("Error: ");
         exit(1);
     }
-    cout << "\nSend: " << "\n{\n" << this->buff << "\n}\n";
+    cout << "\nSend: " << "\n{\n" << buff << "\n}\n";
 }
-void Client::rcvFromServer() {
+void Client::rcvFromServer(int fd, char *buff) {
     int ret;
-    ret = recv(this->clientfd, this->buff, BUFF_SIZE, 0);
+    ret = recv(fd, buff, BUFF_SIZE, 0);
     if (ret < 0) {
         perror("Error: ");
         exit(1);
     }
-    this->buff[ret] = '\0';
-    cout << "\nReceiv: " << "\n{\n" << this->buff << "\n}\n";
+    buff[ret] = '\0';
+    cout << "\nReceiv: " << "\n{\n" << buff << "\n}\n";
 }
 
-void Client::rp_register()
+void Client::rp_register(char *rq_message)
 {
-    struct rp_register rp = message_to_rp_register(this->buff);
+    struct rp_register rp = message_to_rp_register(rq_message);
     if (rp.accept) {
         this->notification->setText("Register Success!!", 50, "", 0);
         this->next_state = INTRO;
@@ -377,13 +414,14 @@ void Client::rp_register()
     }
 }
 
-void Client::rp_login() {
-    struct rp_login rp = message_to_rp_login(this->buff);
+void Client::rp_login(char *rq_message) {
+    struct rp_login rp = message_to_rp_login(rq_message);
     if (rp.accept) {
         this->notification->setText("Login Success!!", 50, "", 0);
         this->next_state = LOBBY;
-        this->userName = rp.username;
-        this->lobbyWindow->setUsername(this->userName);
+        User *user = new User(rp.username, "");
+        this->userClient = new UserClient(user);
+        this->lobbyWindow->setUsername(this->userClient->getUser()->getUsername());
     } else {
         this->notification->setText("Login Fail!!", 50, rp.notification, 30);
         this->next_state = LOGIN;
@@ -391,23 +429,24 @@ void Client::rp_login() {
 
 }
 
-void Client::rp_logout() {
-    struct rp_logout rp = message_to_rp_logout(this->buff);
+void Client::rp_logout(char *rq_message) {
+    struct rp_logout rp = message_to_rp_logout(rq_message);
     if (rp.accept) {
         this->notification->setText("Logout Success!!", 50, "", 0);
         this->next_state = INTRO;
-        this->userName = "";
+        delete this->userClient;
+        this->userClient = nullptr;
     } else {
         this->notification->setText("Logout Fail!!", 50, rp.notification, 30);
         this->next_state = LOBBY;
     }
 }
 
-void Client::rp_createRoom() {
-    struct rp_create_room rp = message_to_rp_create_room(this->buff);
+void Client::rp_createRoom(char *rq_message) {
+    struct rp_create_room rp = message_to_rp_create_room(rq_message);
     if (rp.accept) {
         this->state = ROOM;
-        this->roomWindow->setupWindow(rp.roomname, vector<string>{this->userName}, vector<bool>{false});
+        this->roomWindow->setupWindow(rp.roomname, vector<UserClient *>{this->userClient}, vector<bool>{false});
 
     } else {
         this->notification->setText("Create Room Fail!!", 50, rp.notification, 30);
@@ -416,8 +455,45 @@ void Client::rp_createRoom() {
     }
 }
 
-void Client::closeSocket()
-{
+void Client::run() {
+    pthread_t thread1, thread2;
+    if (connect(this->clientfd, (sockaddr*)&this->servAddr, sizeof(this->servAddr))) {
+        perror("Error: ");
+        exit(1);
+    }
+    if (connect(this->listenfd, (sockaddr*)&this->servAddr, sizeof(this->servAddr))) {
+        perror("Error: ");
+        exit(1);
+    }
+    if (pthread_create(&thread1, nullptr, Client::routine1, this) < 0) {
+        perror("Could not create thread:");
+        exit(1);
+    }
+    if (pthread_create(&thread2, nullptr, Client::routine2, this) < 0) {
+        perror("Could not create thread:");
+        exit(1);
+    }
+    pthread_join(thread1, nullptr);
+    pthread_join(thread2, nullptr);
+
     close(this->clientfd);
     close(this->listenfd);
+
+}
+
+void * Client::routine1(void * c) {
+    Client* client = (Client *)c;
+    
+    while(client->running()) {
+        client->update();
+
+        client->render();
+    }
+    return nullptr;
+}
+
+void * Client::routine2(void *c) {
+
+
+    return nullptr;
 }
