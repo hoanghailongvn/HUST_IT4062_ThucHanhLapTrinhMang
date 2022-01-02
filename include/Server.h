@@ -26,6 +26,7 @@ private:
 
     static std::vector<User *> listUser;
     static std::vector<Room *> listRoom;
+    static std::vector<UserClient *> listClient;
 
     std::vector<pthread_t> threads;
 
@@ -41,6 +42,10 @@ public:
     static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient *&userClient);
     static void rq_exitRoom(char *rq_exitRoom, UserClient *&userClient);
     static void rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&userClient);
+
+    static struct update_lobby to_struct_update_lobby();
+    static void updateLobby();
+    static void updateLobby(UserClient *&userClient);
 
     static void rcvFromClient(int connfd, char *rcv_message);
     static void sendToClient(int connfd, char *send_message);

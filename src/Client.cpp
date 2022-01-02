@@ -455,6 +455,11 @@ void Client::rp_createRoom(char *rq_message) {
     }
 }
 
+void Client::rp_update_lobby(char *message) {
+    struct update_lobby rp = message_to_update_lobby(message);
+    this->lobbyWindow->updateRoom(rp);
+}
+
 void Client::run() {
     pthread_t thread1, thread2;
     if (connect(this->clientfd, (sockaddr*)&this->servAddr, sizeof(this->servAddr))) {
@@ -493,7 +498,25 @@ void * Client::routine1(void * c) {
 }
 
 void * Client::routine2(void *c) {
+    Client* client = (Client *)c;
+    int connfd = client->listenfd;
 
+    char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
+    
+    int exit_check = false;
+    while (!exit_check) {
+        client->rcvFromServer(connfd, rcv_message);
+        switch (getCode(rcv_message)) {
+        case UPDATE_LOBBY:
+            client->rp_update_lobby(rcv_message);
+
+            break;
+        
+        default:
+            break;
+        }
+    }
+    close(connfd);
 
     return nullptr;
 }

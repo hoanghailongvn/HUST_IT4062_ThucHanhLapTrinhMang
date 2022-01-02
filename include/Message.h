@@ -6,13 +6,16 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include "GameConfig.h"
 
-enum MessageType {RQ_EXIT = 0, RQ_REGISTER, RP_REGISTER, 
+enum MessageType {
+RQ_EXIT = 0, 
+RQ_REGISTER, RP_REGISTER, 
 RQ_LOGIN, RP_LOGIN, 
 RQ_LOGOUT, RP_LOGOUT, 
 RQ_CREATE_ROOM, RP_CREATE_ROOM, 
 RQ_JOIN_ROOM, RP_JOIN_ROOM,
-RQ_UPDATE_LOBBY, RP_UPDATE_LOBBY,
+UPDATE_LOBBY,
 RQ_EXIT_ROOM};
 
 struct rq_exit {
@@ -76,12 +79,12 @@ struct rp_join_room {
     std::string notification = " ";
 };
 
-struct rq_update_lobby{
-    MessageType type = RQ_UPDATE_LOBBY;
-};
+struct update_lobby{
+    MessageType type = UPDATE_LOBBY;
+    std::vector<std::string> name = {};
+    std::vector<bool> ingame = {};
+    std::vector<int> number_user = {};
 
-struct rp_update_lobby{
-    MessageType type = RP_UPDATE_LOBBY;
 };
 
 struct rq_exit_room {
@@ -105,8 +108,7 @@ rp_create_room message_to_rp_create_room(char *message);
 rq_join_room message_to_rq_join_room(char *message);
 rp_join_room message_to_rp_join_room(char *message);
 
-rq_update_lobby message_to_rq_update_lobby(char *message);
-rp_update_lobby message_to_rp_update_lobby(char *message);
+update_lobby message_to_update_lobby(char *message);
 
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<std::string> split(char *input, std::string delimiter);

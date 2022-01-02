@@ -13,7 +13,7 @@
 #define userDataPath "data/password.txt"
 #define BUFF_SIZE 1024
 #define SERVER_PORT 8080
-#define MAX_ROOM 20
+#define MAX_ROOM 4
 
 
 

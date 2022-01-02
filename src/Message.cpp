@@ -141,22 +141,35 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
-    case RQ_UPDATE_LOBBY:
+    case UPDATE_LOBBY:
     {
-        auto *struct_obj = (rq_update_lobby *)p;
+        auto *struct_obj = (update_lobby *)p;
+        int nb_room = struct_obj->name.size();
+        //Type
         final << struct_obj->type << "\n";
-        // final << struct_obj->id << "\0";
+        
+        //Room name
+        if (nb_room > 0) {
+            for (int i = 0; i < nb_room - 1; i++) {
+                final << struct_obj->name.at(i) << " ";
+            }
+            final << struct_obj->name.at(nb_room - 1) << "\n";
 
-        temp = final.str();
-        strcpy(output, temp.c_str());
-        break;
-    }
-    case RP_UPDATE_LOBBY:
-    {
-        auto *struct_obj = (rp_update_lobby *)p;
-        final << struct_obj->type << "\n";
-        // final << struct_obj->accept << "\n";
-        // final << struct_obj->notification << "\0";
+            // number user each room
+            for (int i = 0; i < nb_room - 1; i++) {
+                final << struct_obj->number_user.at(i) << " ";
+            }
+            final << struct_obj->number_user.at(nb_room - 1) << "\n";
+
+            // room state
+            for (int i = 0; i < nb_room - 1; i++) {
+                final << struct_obj->ingame.at(i) << " ";
+            }
+            final << struct_obj->ingame.at(nb_room - 1) << "\0";
+        } else {
+            final << "\n" << "\n" << "\0";
+        }
+        
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -166,7 +179,6 @@ void struct_to_message(void *p, MessageType type, char *output) {
     {
         auto *struct_obj = (rq_exit_room *)p;
         final << struct_obj->type << "\0";
-
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -285,26 +297,42 @@ rp_create_room message_to_rp_create_room(char *message) {
     return res;
 }
 
-rq_update_lobby message_to_rq_update_lobby(char *message) {
+update_lobby message_to_update_lobby(char *message) {
     auto splited_line = split(message, "\n");
-    rq_update_lobby res;
-    // res.id = splited_line.at(1);
+    update_lobby res;
 
-    return res;
-}
 
-rp_update_lobby message_to_rp_update_lobby(char *message) {
-    auto splited_line = split(message, "\n");
-    rp_update_lobby res;
-    // res.accept = atoi(splited_line.at(1));
-    // if (!res.accept) {
-    //     res.notification = splited_line.at(2);
-    // } else {
-    //     res.notification = "";
-    // }
+    if(splited_line.at(1).length() > 0) {
+        char temp[BUFF_SIZE + 1];
+        memset(temp, 0, sizeof(temp));
+        
+        //room name
+        strcpy(temp, splited_line.at(1).c_str());
+        auto splited_temp = split(temp, " ");
+        for (auto name: splited_temp) {
+            res.name.push_back(name);
+        }
+
+        //nb_user
+        memset(temp, 0, sizeof(temp));
+        strcpy(temp, splited_line.at(2).c_str());
+        splited_temp = split(temp, " ");
+        for (auto nb_user: splited_temp) {
+            res.number_user.push_back(stoi(nb_user));
+        }
+
+        //room state
+        memset(temp, 0, sizeof(temp));
+        strcpy(temp, splited_line.at(3).c_str());
+        splited_temp = split(temp, " ");
+        for (auto state: splited_temp) {
+            res.ingame.push_back(stoi(state));
+        }
+    }
     
     return res;
 }
+
 int getCode(char *input) {
     auto splited_line = split(input, "\n");
     int res = stoi(splited_line.at(0));

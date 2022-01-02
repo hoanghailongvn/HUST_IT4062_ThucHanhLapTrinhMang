@@ -2,8 +2,9 @@
 
 using namespace std;
 
-std::vector<User *> Server::listUser;
-std::vector<Room *> Server::listRoom;
+vector<User *> Server::listUser;
+vector<Room *> Server::listRoom;
+vector<UserClient *> Server::listClient;
 
 Server::Server()
 {
@@ -73,6 +74,8 @@ void Server::run()
 
         userClient->setClientfd(connfd1);
         userClient->setWritefd(connfd2);
+
+        Server::listClient.push_back(userClient);
 
         pthread_t new_thread;
         if (pthread_create(&new_thread, nullptr, Server::routine1, userClient) < 0) {
@@ -174,6 +177,8 @@ void Server::rq_login(char *rq_login, char *rp_login, int connfd, UserClient *&u
         userClient->setUser(target);
         target->setState(ONLINE);
         rp.username = target->getUsername();
+
+        Server::updateLobby(userClient);
     }
     struct_to_message(&rp, RP_LOGIN, rp_login);
 }
@@ -192,7 +197,6 @@ void Server::rq_logout(char *rq_logout, char *rp_logout, UserClient *&userClient
 void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient *&userClient) {
     rq_create_room rq = message_to_rq_create_room(rq_createRoom);
     rp_create_room rp;
-    
     if(Server::listRoom.size() < MAX_ROOM) {
         bool check = true;
         for(auto room: Server::listRoom) {
@@ -205,11 +209,15 @@ void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient 
         }
 
         if (check) {
+
             Room *newRoom = new Room(rq.name, vector<UserClient *>{userClient}, vector<bool>{false});
             Server::listRoom.push_back(newRoom);
             userClient->setRoom(newRoom);
             rp.accept = true;
             rp.roomname = rq.name;
+
+            Server::updateLobby();
+
         }
         
     } else {
@@ -220,7 +228,31 @@ void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient 
 }
 
 void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&userClient) {
-    ///
+    rq_join_room rq = message_to_rq_join_room(rq_joinRoom);
+    rp_join_room rp;
+
+    Room *room_target = nullptr;
+
+    for (auto room: Server::listRoom) {
+        if (room->getName().compare(rq.room_name) == 0) {
+            room_target = room;
+            break;
+        }
+    }
+
+    if (room_target == nullptr) {
+        rp.accept == false;
+        rp.notification = "Room name not exist!!";
+    } else if(room_target->getNumberUser() == 4) {
+        rp.accept = false;
+        rp.notification = "Full!";
+    } else {
+        rp.accept = true;
+        Server::updateLobby();
+    }
+
+    
+    struct_to_message(&rp, RP_JOIN_ROOM, rp_joinRoom);
 }
 
 void Server::rq_exitRoom(char *rq_exitRoom, UserClient *&userClient) {
@@ -235,6 +267,36 @@ void Server::rq_exitRoom(char *rq_exitRoom, UserClient *&userClient) {
         userClient->getRoom()->removeUser(userClient);
     }
     userClient->setRoom(nullptr);
+
+    Server::updateLobby();
+}
+
+struct update_lobby Server::to_struct_update_lobby() {
+    struct update_lobby res;
+    for (auto room: Server::listRoom) {
+        res.name.push_back(room->getName());
+        res.ingame.push_back(room->isIngame());
+        res.number_user.push_back(room->getNumberUser());
+    }
+    return res;
+}
+
+void Server::updateLobby() {
+    struct update_lobby res = Server::to_struct_update_lobby();
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&res, UPDATE_LOBBY, send_msg);
+
+    for (auto client: Server::listClient) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
+
+}
+void Server::updateLobby(UserClient *&userClient) {
+    struct update_lobby res = Server::to_struct_update_lobby();
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&res, UPDATE_LOBBY, send_msg);
+
+    Server::sendToClient(userClient->getWritefd(), send_msg);
 }
 
 
@@ -265,8 +327,6 @@ void* Server::routine1(void *input) {
     UserClient *userClient = (UserClient *)input;
     int connfd = userClient->getClientfd();
 
-    User *userGlobal = nullptr;
-    Room *clientRoom = nullptr;
     char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
     
     int exit_check = false;
@@ -275,8 +335,8 @@ void* Server::routine1(void *input) {
         switch (getCode(rcv_message)) {
         case RQ_EXIT:
             exit_check = true;
-            if(userGlobal != nullptr) {
-                userGlobal->setState(OFFLINE);
+            if(userClient->getUser() != nullptr) {
+                userClient->getUser()->setState(OFFLINE);
                 delete userClient;
             }
             break;

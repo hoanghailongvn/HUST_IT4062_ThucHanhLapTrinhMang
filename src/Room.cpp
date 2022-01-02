@@ -47,3 +47,7 @@ UserClient* Room::getHost() {
         return nullptr;
     }
 }
+
+bool Room::isIngame() {
+    return this->ingame;
+}

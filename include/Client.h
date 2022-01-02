@@ -107,6 +107,7 @@ public:
     void rp_logout(char *rq_message);
     void rp_createRoom(char *rq_message);
     void rp_joinRoom(char *rq_message);
+    void rp_update_lobby(char *message);
 
     static void* routine1(void *);
     static void* routine2(void *); 

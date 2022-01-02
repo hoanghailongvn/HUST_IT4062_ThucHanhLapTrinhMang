@@ -12,12 +12,16 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+class RoomBox;
+
 class LobbyWindow {
 private:
     Button *logout_btn;
     Button *createRoom_btn;
     Button *joinRoom_btn;
     
+    std::vector<RoomBox *> listRoom;
+
     sf::Text *main;
     sf::Text *userName;
 public:
@@ -29,6 +33,8 @@ public:
     void refresh();
 
     void update(sf::Vector2f mousePos);
+    void updateRoom(struct update_lobby);
+    
     void drawTo(sf::RenderTarget &target);
 
     // bool submitPressed(char *message, int *fail_type);

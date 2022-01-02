@@ -1,3 +1,7 @@
+/*
+UserBox used in room
+*/
+
 #ifndef USERBOX_H
 #define USERBOX_H
 

@@ -12,6 +12,7 @@ class Room {
     std::string name;
     std::vector<UserClient *> listUser;
     std::vector<bool> ready;
+    bool ingame = false;
     void setup(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
 
     public:
@@ -24,6 +25,7 @@ class Room {
     std::string getName();
     void setReady(int stand, bool ready);
     void removeUser(UserClient *);
+    bool isIngame();
 };
 
 #endif
