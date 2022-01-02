@@ -23,16 +23,13 @@ UserBox::UserBox(float x, float y, float width, float height,
     this->username.setPosition(sf::Vector2f(x + 10, y + 10));
     this->username.setFont(*this->font);
     this->username.setCharacterSize(30);
-
-    this->userClient = nullptr;
 }
 
 UserBox::~UserBox() {}
 
-void UserBox::setup(UserClient *userClient, bool ready) {
+void UserBox::setup(string name, bool ready) {
     this->ready = ready;
-    this->username.setString(userClient->getUser()->getUsername());
-    this->userClient = userClient;
+    this->username.setString(name);
 }
 
 void UserBox::update(sf::Vector2f mousePos){
@@ -41,7 +38,7 @@ void UserBox::update(sf::Vector2f mousePos){
 
 void UserBox::drawTo(sf::RenderTarget& target) {
     target.draw(this->shape);
-    if(this->userClient != nullptr) {
+    if(this->username.getString().getSize() > 0) {
         target.draw(this->circle_shape);
         target.draw(this->username);
     }

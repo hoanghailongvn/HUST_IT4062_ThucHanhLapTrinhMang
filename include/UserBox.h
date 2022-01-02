@@ -24,7 +24,6 @@ private:
     sf::RectangleShape shape;
     sf::CircleShape circle_shape;
     sf::Text username;
-    UserClient *userClient;
     sf::Font *font;
 
     bool ready;
@@ -33,7 +32,7 @@ public:
     UserBox(float x, float y, float width, float height, sf::Font *font, sf::Color userColor);
     ~UserBox();
 
-    void setup(UserClient *userClient, bool ready);
+    void setup(std::string name, bool ready);
 
     void update(sf::Vector2f mousePos);
     void drawTo(sf::RenderTarget& target);

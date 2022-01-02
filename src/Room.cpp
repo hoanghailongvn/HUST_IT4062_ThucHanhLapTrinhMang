@@ -31,6 +31,15 @@ int Room::getNumberUser() {
     return this->listUser.size();
 }
 
+vector<UserClient *> Room::getListUser() {
+    return this->listUser;
+}
+
+vector<bool> Room::getReady() {
+    return this->ready;
+}
+
+
 void Room::removeUser(UserClient *userClient) {
     for(int i = 0; i < this->listUser.size(); i++) {
         if(this->listUser.at(i) == userClient) {
@@ -38,6 +47,11 @@ void Room::removeUser(UserClient *userClient) {
             break;
         }
     }
+}
+
+void Room::addUser(UserClient *userClient) {
+    this->listUser.push_back(userClient);
+    this->ready.push_back(false);
 }
 
 UserClient* Room::getHost() {

@@ -175,6 +175,38 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
+    case UPDATE_ROOM:
+    {
+        auto *struct_obj = (update_room *)p;
+        int nb_user = struct_obj->username.size();
+        //Type
+        final << struct_obj->type << "\n";
+        
+        if (nb_user > 0) {
+            //room name
+            final << struct_obj->room_name << "\n";
+
+            //user name
+            for (int i = 0; i < nb_user - 1; i++) {
+                final << struct_obj->username.at(i) << " ";
+            }
+            final << struct_obj->username.at(nb_user - 1) << "\n";
+
+            // ready state
+            for (int i = 0; i < nb_user - 1; i++) {
+                final << struct_obj->ready.at(i) << " ";
+            }
+            final << struct_obj->ready.at(nb_user - 1) << "\0";
+
+        } else {
+            final << "\n" << "\n" << "\n" << "\0";
+        }
+        
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     case RQ_EXIT_ROOM:
     {
         auto *struct_obj = (rq_exit_room *)p;
@@ -327,6 +359,35 @@ update_lobby message_to_update_lobby(char *message) {
         splited_temp = split(temp, " ");
         for (auto state: splited_temp) {
             res.ingame.push_back(stoi(state));
+        }
+    }
+    
+    return res;
+}
+
+update_room message_to_update_room(char *message) {
+    auto splited_line = split(message, "\n");
+    update_room res;
+
+    res.room_name = splited_line.at(1);
+
+    if(splited_line.at(2).length() > 0) {
+        char temp[BUFF_SIZE + 1];
+        memset(temp, 0, sizeof(temp));
+        
+        //user name
+        strcpy(temp, splited_line.at(2).c_str());
+        auto splited_temp = split(temp, " ");
+        for (auto username: splited_temp) {
+            res.username.push_back(username);
+        }
+
+        //ready
+        memset(temp, 0, sizeof(temp));
+        strcpy(temp, splited_line.at(3).c_str());
+        splited_temp = split(temp, " ");
+        for (auto ready: splited_temp) {
+            res.ready.push_back(stoi(ready));
         }
     }
     

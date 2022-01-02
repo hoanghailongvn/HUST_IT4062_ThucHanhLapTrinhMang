@@ -274,7 +274,7 @@ void Client::pollEvents()
                     if(fail_type == 0) {
                         this->sendToServer(this->clientfd, send_msg);
                         this->rcvFromServer(this->clientfd, rcv_msg);
-                        this->rp_createRoom(rcv_msg);
+                        this->rp_joinRoom(rcv_msg);
                     } else if (fail_type == 1) {
                         this->notification->setText("Join Fail!!", 50, "Empty field.", 30);
                         this->state = NOTIFICATION;
@@ -372,7 +372,7 @@ void Client::render()
         this->joinWindow->drawTo(*this->window);
         break;
     case ROOM:
-        this->roomWindow->drawTo(*this->window);
+        this->roomWindow->drawTo(*this->window, this->userClient);
         break;
     default:
         break;
@@ -446,8 +446,6 @@ void Client::rp_createRoom(char *rq_message) {
     struct rp_create_room rp = message_to_rp_create_room(rq_message);
     if (rp.accept) {
         this->state = ROOM;
-        this->roomWindow->setupWindow(rp.roomname, vector<UserClient *>{this->userClient}, vector<bool>{false});
-
     } else {
         this->notification->setText("Create Room Fail!!", 50, rp.notification, 30);
         this->state = NOTIFICATION;
@@ -458,6 +456,22 @@ void Client::rp_createRoom(char *rq_message) {
 void Client::rp_update_lobby(char *message) {
     struct update_lobby rp = message_to_update_lobby(message);
     this->lobbyWindow->updateRoom(rp);
+}
+
+void Client::rp_update_room(char *message) {
+    struct update_room rp = message_to_update_room(message);
+    this->roomWindow->updateRoom(rp);
+}
+
+void Client::rp_joinRoom(char *message) {
+    struct rp_join_room rp = message_to_rp_join_room(message);
+    if (rp.accept) {
+        this->state = ROOM;
+    } else {
+        this->notification->setText("Join Room Fail!!", 50, rp.notification, 30);
+        this->state = NOTIFICATION;
+        this->next_state = LOBBY;
+    }
 }
 
 void Client::run() {
@@ -509,9 +523,10 @@ void * Client::routine2(void *c) {
         switch (getCode(rcv_message)) {
         case UPDATE_LOBBY:
             client->rp_update_lobby(rcv_message);
-
             break;
-        
+        case UPDATE_ROOM:
+            client->rp_update_room(rcv_message);
+            break;
         default:
             break;
         }

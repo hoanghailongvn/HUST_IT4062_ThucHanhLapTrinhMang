@@ -15,7 +15,8 @@ RQ_LOGIN, RP_LOGIN,
 RQ_LOGOUT, RP_LOGOUT, 
 RQ_CREATE_ROOM, RP_CREATE_ROOM, 
 RQ_JOIN_ROOM, RP_JOIN_ROOM,
-UPDATE_LOBBY,
+UPDATE_LOBBY, UPDATE_ROOM,
+RQ_READY, RQ_START,
 RQ_EXIT_ROOM};
 
 struct rq_exit {
@@ -87,6 +88,21 @@ struct update_lobby{
 
 };
 
+struct update_room{
+    MessageType type = UPDATE_ROOM;
+    std::string room_name = "";
+    std::vector<std::string> username = {};
+    std::vector<bool> ready = {};
+};
+
+struct rq_ready{
+    MessageType type = RQ_READY;
+};
+
+struct rq_start{
+    MessageType type = RQ_START;
+};
+
 struct rq_exit_room {
     MessageType type = RQ_EXIT_ROOM;
 };
@@ -109,6 +125,7 @@ rq_join_room message_to_rq_join_room(char *message);
 rp_join_room message_to_rp_join_room(char *message);
 
 update_lobby message_to_update_lobby(char *message);
+update_room message_to_update_room(char *message);
 
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<std::string> split(char *input, std::string delimiter);

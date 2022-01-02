@@ -23,7 +23,10 @@ class Room {
     int getNumberUser();
     UserClient* getHost();
     std::string getName();
+    std::vector<UserClient *> getListUser();
+    std::vector<bool> getReady();
     void setReady(int stand, bool ready);
+    void addUser(UserClient *);
     void removeUser(UserClient *);
     bool isIngame();
 };

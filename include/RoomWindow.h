@@ -17,10 +17,14 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-class RoomWindow : public Room {
+class RoomWindow{
 private:
+    std::string name;
+    std::vector<bool> ready;
+
     Button *back_btn, *ready_btn, *start_btn;
     std::vector <UserBox *> userBoxList;
+    std::vector <std::string> userNameList;
     sf::Font *font;
     sf::Text *main;
 
@@ -28,13 +32,14 @@ public:
     RoomWindow(sf::Font *font);
     ~RoomWindow();
 
-    void setupWindow(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
-
     void update(sf::Vector2f mousePos);
-    void drawTo(sf::RenderTarget &target);
+    void updateRoom(struct update_room input);
+    void drawTo(sf::RenderTarget &target, UserClient *userClient);
+
+    std::string getName();
+    void setName(std::string name);
 
     bool backPressed(char *message);
-
 };
 
 #endif 

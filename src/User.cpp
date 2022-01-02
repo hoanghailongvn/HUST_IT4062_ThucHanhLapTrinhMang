@@ -18,10 +18,6 @@ State User::getState() {
     return this->state;
 }
 
-void User::setConnfd(int connfd) {
-    this->connfd = connfd;
-}
-
 bool User::isOnline() {
     return this->state == ONLINE || this->state == INGAME;
 }

@@ -217,6 +217,8 @@ void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient 
             rp.roomname = rq.name;
 
             Server::updateLobby();
+            sleep(0.1);
+            Server::updateRoom(newRoom);
 
         }
         
@@ -241,33 +243,41 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
     }
 
     if (room_target == nullptr) {
-        rp.accept == false;
+        rp.accept = false;
         rp.notification = "Room name not exist!!";
     } else if(room_target->getNumberUser() == 4) {
         rp.accept = false;
         rp.notification = "Full!";
     } else {
         rp.accept = true;
+        room_target->addUser(userClient);
+        userClient->setRoom(room_target);
+
         Server::updateLobby();
+        sleep(0.1);
+        Server::updateRoom(room_target);
     }
 
-    
     struct_to_message(&rp, RP_JOIN_ROOM, rp_joinRoom);
 }
 
 void Server::rq_exitRoom(char *rq_exitRoom, UserClient *&userClient) {
-    if(userClient->getRoom()->getNumberUser() == 1) {
+    Room *room_target = userClient->getRoom();
+
+    cout << room_target->getNumberUser() << endl;
+
+    if(room_target->getNumberUser() == 1) {
         for (int i = 0; i < Server::listRoom.size(); i++) {
-            if (Server::listRoom.at(i) == userClient->getRoom()) {
+            if (Server::listRoom.at(i) == room_target) {
                 Server::listRoom.erase(Server::listRoom.begin() + i);
                 break;
             }
         }
     } else {
-        userClient->getRoom()->removeUser(userClient);
+        room_target->removeUser(userClient);
+        Server::updateRoom(room_target);
     }
     userClient->setRoom(nullptr);
-
     Server::updateLobby();
 }
 
@@ -280,6 +290,17 @@ struct update_lobby Server::to_struct_update_lobby() {
     }
     return res;
 }
+struct update_room Server::to_struct_update_room(Room *&room) {
+    struct update_room res;
+    res.room_name = room->getName();
+
+    for (auto user: room->getListUser()) {
+        res.username.push_back(user->getUser()->getUsername());
+        res.ready = room->getReady();
+    }
+    return res;
+}
+
 
 void Server::updateLobby() {
     struct update_lobby res = Server::to_struct_update_lobby();
@@ -299,6 +320,15 @@ void Server::updateLobby(UserClient *&userClient) {
     Server::sendToClient(userClient->getWritefd(), send_msg);
 }
 
+void Server::updateRoom(Room *&room) {
+    struct update_room res = Server::to_struct_update_room(room);
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&res, UPDATE_ROOM, send_msg);
+
+    for (auto client: room->getListUser()) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
+}
 
 void Server::rcvFromClient(int connfd, char *rcv_message) {
     int rcvBytes = recv(connfd, rcv_message, BUFF_SIZE, 0);
@@ -357,6 +387,11 @@ void* Server::routine1(void *input) {
 
         case RQ_CREATE_ROOM:
             Server::rq_createRoom(rcv_message, send_message, userClient);
+            Server::sendToClient(connfd, send_message);
+            break;
+
+        case RQ_JOIN_ROOM:
+            Server::rq_joinRoom(rcv_message, send_message, userClient);
             Server::sendToClient(connfd, send_message);
             break;
 
