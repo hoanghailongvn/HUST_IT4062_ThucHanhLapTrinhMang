@@ -215,6 +215,22 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
+    case RQ_READY:
+    {
+        auto *struct_obj = (rq_ready *)p;
+        final << struct_obj->type << "\0";
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
+    case RQ_START:
+    {
+        auto *struct_obj = (rq_start *)p;
+        final << struct_obj->type << "\0";
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     default:
         break;
     }

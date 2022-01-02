@@ -23,7 +23,7 @@ class UserBox {
 private:
     sf::RectangleShape shape;
     sf::CircleShape circle_shape;
-    sf::Text username;
+    sf::Text username, ready_text;
     sf::Font *font;
 
     bool ready;

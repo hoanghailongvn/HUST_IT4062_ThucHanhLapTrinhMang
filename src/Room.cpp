@@ -19,8 +19,14 @@ void Room::setup(string name, vector<UserClient *> listUser, vector<bool> ready)
     this->ready = ready;
 }
 
-void Room::setReady(int stand, bool ready) {
-    this->ready.at(stand) = ready;
+void Room::setReady(UserClient *userClient) {
+    int nb_user = this->getListUser().size();
+    for(int i = 0; i < nb_user; i++) {
+        if (userClient == this->getListUser().at(i)) {
+            this->ready.at(i) = !this->ready.at(i);
+            break;
+        }
+    }
 }
 
 string Room::getName() {

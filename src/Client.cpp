@@ -291,6 +291,8 @@ void Client::pollEvents()
                 if (this->roomWindow->backPressed(send_msg)) {
                     this->sendToServer(this->clientfd, send_msg);
                     this->state = LOBBY;
+                } else if (this->roomWindow->readyPressed(send_msg)) {
+                    this->sendToServer(this->clientfd, send_msg);
                 }
 
                 break;

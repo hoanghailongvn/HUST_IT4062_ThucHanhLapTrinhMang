@@ -14,7 +14,7 @@ UserBox::UserBox(float x, float y, float width, float height,
     this->shape.setOutlineThickness(8);
     this->shape.setFillColor(sf::Color::Black);
 
-    this->circle_shape.setPosition(sf::Vector2f(x + 55, y + 100));
+    this->circle_shape.setPosition(sf::Vector2f(x + 55, y + 80));
     this->circle_shape.setRadius(30);
     this->circle_shape.setFillColor(userColor);
     this->circle_shape.setOutlineColor(sf::Color::White);
@@ -23,6 +23,11 @@ UserBox::UserBox(float x, float y, float width, float height,
     this->username.setPosition(sf::Vector2f(x + 10, y + 10));
     this->username.setFont(*this->font);
     this->username.setCharacterSize(30);
+
+    this->ready_text.setPosition(sf::Vector2f(x + 10, y + 150));
+    this->ready_text.setFont(*this->font);
+    this->ready_text.setCharacterSize(30);
+    this->ready_text.setString("SS!");
 }
 
 UserBox::~UserBox() {}
@@ -41,5 +46,8 @@ void UserBox::drawTo(sf::RenderTarget& target) {
     if(this->username.getString().getSize() > 0) {
         target.draw(this->circle_shape);
         target.draw(this->username);
+        if(this->ready) {
+            target.draw(this->ready_text);
+        }
     }
 }

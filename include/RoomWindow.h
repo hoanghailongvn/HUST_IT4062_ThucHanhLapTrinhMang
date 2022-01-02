@@ -40,6 +40,8 @@ public:
     void setName(std::string name);
 
     bool backPressed(char *message);
+    bool readyPressed(char *message);
+    bool startPressed(char *message);
 };
 
 #endif 

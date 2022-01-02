@@ -261,7 +261,7 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
     struct_to_message(&rp, RP_JOIN_ROOM, rp_joinRoom);
 }
 
-void Server::rq_exitRoom(char *rq_exitRoom, UserClient *&userClient) {
+void Server::rq_exitRoom(UserClient *&userClient) {
     Room *room_target = userClient->getRoom();
 
     cout << room_target->getNumberUser() << endl;
@@ -279,6 +279,12 @@ void Server::rq_exitRoom(char *rq_exitRoom, UserClient *&userClient) {
     }
     userClient->setRoom(nullptr);
     Server::updateLobby();
+}
+
+void Server::rq_ready(UserClient *&userClient) {
+    Room *room_target = userClient->getRoom();
+    room_target->setReady(userClient);
+    Server::updateRoom(room_target);
 }
 
 struct update_lobby Server::to_struct_update_lobby() {
@@ -396,7 +402,11 @@ void* Server::routine1(void *input) {
             break;
 
         case RQ_EXIT_ROOM:
-            Server::rq_exitRoom(rcv_message, userClient);
+            Server::rq_exitRoom(userClient);
+            break;
+
+        case RQ_READY:
+            Server::rq_ready(userClient);
             break;
         default:
             break;

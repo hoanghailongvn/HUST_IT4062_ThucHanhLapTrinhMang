@@ -40,8 +40,9 @@ public:
     static void rq_login(char *rq_login, char *rp_login, int connfd, UserClient *&userClient);
     static void rq_logout(char *rq_logout, char *rp_logout, UserClient *&userClient);
     static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient *&userClient);
-    static void rq_exitRoom(char *rq_exitRoom, UserClient *&userClient);
+    static void rq_exitRoom(UserClient *&userClient);
     static void rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&userClient);
+    static void rq_ready(UserClient *&userClient);
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);

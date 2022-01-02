@@ -90,3 +90,12 @@ bool RoomWindow::backPressed(char *message) {
     }
     return false;
 }
+
+bool RoomWindow::readyPressed(char *message) {
+    if (this->ready_btn->isPressed()) {
+        rq_ready rq;
+        struct_to_message(&rq, RQ_READY, message);
+        return true;
+    }
+    return false;
+}
