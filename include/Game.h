@@ -11,22 +11,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 
-/*
-    Class that acts as the game engine.
-    Wrapper class.
-*/
+enum Action {UP, DOWN, LEFT, RIGHT, SPACE};
 
 class Game {
 private:
-    //Variables
-    //Window
-    sf::RenderWindow* window;
-    sf::VideoMode videoMode;
-    sf::Event ev;
-
-    // Mouse position
-    sf::Vector2i mousePosWindow;
-    sf::Vector2f mousePosView;
 
     // Game logic
     bool endGame;

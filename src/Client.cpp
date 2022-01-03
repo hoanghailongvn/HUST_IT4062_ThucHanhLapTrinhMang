@@ -293,6 +293,8 @@ void Client::pollEvents()
                     this->state = LOBBY;
                 } else if (this->roomWindow->readyPressed(send_msg)) {
                     this->sendToServer(this->clientfd, send_msg);
+                } else if (this->roomWindow->startPressed(send_msg)) {
+                    this->sendToServer(this->clientfd, send_msg);
                 }
 
                 break;
@@ -374,7 +376,7 @@ void Client::render()
         this->joinWindow->drawTo(*this->window);
         break;
     case ROOM:
-        this->roomWindow->drawTo(*this->window, this->userClient);
+        this->roomWindow->drawTo(*this->window);
         break;
     default:
         break;
@@ -462,7 +464,7 @@ void Client::rp_update_lobby(char *message) {
 
 void Client::rp_update_room(char *message) {
     struct update_room rp = message_to_update_room(message);
-    this->roomWindow->updateRoom(rp);
+    this->roomWindow->updateRoom(rp, this->userClient);
 }
 
 void Client::rp_joinRoom(char *message) {
@@ -536,4 +538,8 @@ void * Client::routine2(void *c) {
     close(connfd);
 
     return nullptr;
+}
+
+UserClient* Client::getUserClient() {
+    return this->userClient;
 }

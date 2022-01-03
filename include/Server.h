@@ -43,12 +43,15 @@ public:
     static void rq_exitRoom(UserClient *&userClient);
     static void rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&userClient);
     static void rq_ready(UserClient *&userClient);
+    static void rq_start(Room *room);
+    static void disconnect(UserClient *&userClient);
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);
     static void updateLobby();
     static void updateLobby(UserClient *&userClient);
     static void updateRoom(Room *&room);
+    static void deleteEmptyRoom();
 
     static void rcvFromClient(int connfd, char *rcv_message);
     static void sendToClient(int connfd, char *send_message);

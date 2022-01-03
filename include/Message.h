@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include "GameConfig.h"
+#include "Game.h"
 
 enum MessageType {
 RQ_EXIT = 0, 
@@ -17,6 +18,9 @@ RQ_CREATE_ROOM, RP_CREATE_ROOM,
 RQ_JOIN_ROOM, RP_JOIN_ROOM,
 UPDATE_LOBBY, UPDATE_ROOM,
 RQ_READY, RQ_START,
+START,
+RQ_ACTION,
+UPDATE_GAME, UPDATE_TARGET, 
 RQ_EXIT_ROOM};
 
 struct rq_exit {
@@ -105,6 +109,10 @@ struct rq_start{
 
 struct rq_exit_room {
     MessageType type = RQ_EXIT_ROOM;
+};
+
+struct start {
+    MessageType type = START;
 };
 
 void struct_to_message(void *p, MessageType type, char *output);

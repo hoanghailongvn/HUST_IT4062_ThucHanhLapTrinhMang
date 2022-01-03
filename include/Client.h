@@ -90,6 +90,8 @@ public:
     Client();
     ~Client();
 
+    UserClient* getUserClient();
+
     const bool running() const;
 
     void pollEvents();

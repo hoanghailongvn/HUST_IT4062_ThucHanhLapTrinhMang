@@ -46,11 +46,16 @@ void RoomWindow::setName(string name) {
 
 void RoomWindow::update(sf::Vector2f mousePos) {
     this->back_btn->update(mousePos);
-    this->ready_btn->update(mousePos);
-    this->start_btn->update(mousePos);   
+    if (this->isHost) {
+        if (this->startable())
+            this->start_btn->update(mousePos);   
+    } else {
+        this->ready_btn->update(mousePos);
+    }
+    
 }
 
-void RoomWindow::updateRoom(struct update_room input) {
+void RoomWindow::updateRoom(struct update_room input, UserClient *userClient) {
     this->name = input.room_name;
     this->main->setString("Room: " + this->name);
 
@@ -66,12 +71,18 @@ void RoomWindow::updateRoom(struct update_room input) {
             this->ready.at(i) = false;
         }
     }
+
+    if(this->userNameList.at(0).compare(userClient->getUser()->getUsername()) == 0) {
+        this->isHost = true;
+    } else {
+        this->isHost = false;
+    }
 }
 
-void RoomWindow::drawTo(sf::RenderTarget &target, UserClient *userClient) {
+void RoomWindow::drawTo(sf::RenderTarget &target) {
     target.draw(*this->main);
     this->back_btn->drawTo(target);
-    if (this->userNameList.at(0).compare(userClient->getUser()->getUsername()) == 0) {
+    if (this->isHost) {
         this->start_btn->drawTo(target);
     } else {
         this->ready_btn->drawTo(target);
@@ -98,4 +109,36 @@ bool RoomWindow::readyPressed(char *message) {
         return true;
     }
     return false;
+}
+
+bool RoomWindow::startPressed(char *message) {
+    if (!this->startable()) {
+        return false;
+    }
+
+    if (this->start_btn->isPressed()) {
+        rq_start rq;
+        struct_to_message(&rq, RQ_START, message);
+        return true;
+    }
+    return false;
+}
+
+bool RoomWindow::startable() {
+    if (this->userNameList.at(1).length() == 0){
+        return false;
+    }
+    bool res = true;
+    for (int i = 1; i < 4; i++) {
+        if (this->userNameList.at(i).length() > 0) {
+            if (!this->ready.at(i)) {
+                res = false;
+                break;
+            }   
+        } else {
+            break;
+        }
+    }
+
+    return res;
 }

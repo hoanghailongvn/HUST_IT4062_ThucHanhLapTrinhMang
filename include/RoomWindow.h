@@ -28,13 +28,14 @@ private:
     sf::Font *font;
     sf::Text *main;
 
+    bool isHost;
 public:
     RoomWindow(sf::Font *font);
     ~RoomWindow();
 
     void update(sf::Vector2f mousePos);
-    void updateRoom(struct update_room input);
-    void drawTo(sf::RenderTarget &target, UserClient *userClient);
+    void updateRoom(struct update_room input, UserClient *);
+    void drawTo(sf::RenderTarget &target);
 
     std::string getName();
     void setName(std::string name);
@@ -42,6 +43,8 @@ public:
     bool backPressed(char *message);
     bool readyPressed(char *message);
     bool startPressed(char *message);
+
+    bool startable();
 };
 
 #endif 

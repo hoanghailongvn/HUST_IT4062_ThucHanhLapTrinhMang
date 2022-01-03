@@ -1,4 +1,5 @@
 #include "../include/Server.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -216,9 +217,9 @@ void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient 
             rp.accept = true;
             rp.roomname = rq.name;
 
-            Server::updateLobby();
-            sleep(0.1);
             Server::updateRoom(newRoom);
+            sleep(0.2);
+            Server::updateLobby();
 
         }
         
@@ -251,6 +252,7 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
     } else {
         rp.accept = true;
         room_target->addUser(userClient);
+        room_target->setReady(userClient, false);
         userClient->setRoom(room_target);
 
         Server::updateLobby();
@@ -264,20 +266,11 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
 void Server::rq_exitRoom(UserClient *&userClient) {
     Room *room_target = userClient->getRoom();
 
-    cout << room_target->getNumberUser() << endl;
-
-    if(room_target->getNumberUser() == 1) {
-        for (int i = 0; i < Server::listRoom.size(); i++) {
-            if (Server::listRoom.at(i) == room_target) {
-                Server::listRoom.erase(Server::listRoom.begin() + i);
-                break;
-            }
-        }
-    } else {
-        room_target->removeUser(userClient);
-        Server::updateRoom(room_target);
-    }
+    room_target->removeUser(userClient);
     userClient->setRoom(nullptr);
+    
+    Server::updateRoom(room_target);
+    Server::deleteEmptyRoom();
     Server::updateLobby();
 }
 
@@ -285,6 +278,16 @@ void Server::rq_ready(UserClient *&userClient) {
     Room *room_target = userClient->getRoom();
     room_target->setReady(userClient);
     Server::updateRoom(room_target);
+}
+
+void Server::rq_start(Room *room) {
+    struct start rp;
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&rp, START, send_msg);
+
+    for (auto client:room->getListUser()) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
 }
 
 struct update_lobby Server::to_struct_update_lobby() {
@@ -307,6 +310,14 @@ struct update_room Server::to_struct_update_room(Room *&room) {
     return res;
 }
 
+void Server::deleteEmptyRoom() {
+    for (int i = 0; i < Server::listRoom.size(); i++) {
+        if(Server::listRoom.at(i)->getNumberUser() == 0) {
+            Server::listRoom.erase(Server::listRoom.begin() + i);
+            i--;
+        }
+    }
+}
 
 void Server::updateLobby() {
     struct update_lobby res = Server::to_struct_update_lobby();
@@ -336,6 +347,7 @@ void Server::updateRoom(Room *&room) {
     }
 }
 
+
 void Server::rcvFromClient(int connfd, char *rcv_message) {
     int rcvBytes = recv(connfd, rcv_message, BUFF_SIZE, 0);
     if (rcvBytes < 0) {
@@ -359,6 +371,23 @@ void Server::sendToClient(int connfd, char *send_message) {
     cout << "\nSend: " << "\n{\n" << send_message << "\n}\n";
 }
 
+void Server::disconnect(UserClient *&userClient) {
+    //Delete client from listClient in Server
+    Server::listClient.erase(remove(Server::listClient.begin(), Server::listClient.end(), userClient), Server::listClient.end());
+    //Set state of account to offline
+    userClient->getUser()->setState(OFFLINE);
+
+    //If user in a room
+    Room *room = userClient->getRoom();
+    if(room != nullptr) {
+        room->removeUser(userClient);
+        Server::updateRoom(room);
+        Server::deleteEmptyRoom();
+        Server::updateLobby();
+    }
+    delete userClient;
+}
+
 void* Server::routine1(void *input) {
     UserClient *userClient = (UserClient *)input;
     int connfd = userClient->getClientfd();
@@ -372,8 +401,7 @@ void* Server::routine1(void *input) {
         case RQ_EXIT:
             exit_check = true;
             if(userClient->getUser() != nullptr) {
-                userClient->getUser()->setState(OFFLINE);
-                delete userClient;
+                Server::disconnect(userClient);
             }
             break;
         case RQ_REGISTER:
@@ -408,6 +436,9 @@ void* Server::routine1(void *input) {
         case RQ_READY:
             Server::rq_ready(userClient);
             break;
+
+        case RQ_START:
+            Server::rq_start(userClient->getRoom());
         default:
             break;
         }
@@ -422,3 +453,4 @@ void *Server::routine2(void *client_socket) {
 
     return nullptr;
 }
+

@@ -29,6 +29,16 @@ void Room::setReady(UserClient *userClient) {
     }
 }
 
+void Room::setReady(UserClient *userClient, bool ready) {
+    int nb_user = this->getListUser().size();
+    for(int i = 0; i < nb_user; i++) {
+        if (userClient == this->getListUser().at(i)) {
+            this->ready.at(i) = ready;
+            break;
+        }
+    }
+}
+
 string Room::getName() {
     return this->name;
 }

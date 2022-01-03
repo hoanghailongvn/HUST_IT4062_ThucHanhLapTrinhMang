@@ -26,6 +26,7 @@ class Room {
     std::vector<UserClient *> getListUser();
     std::vector<bool> getReady();
     void setReady(UserClient *);
+    void setReady(UserClient *, bool ready);
     void addUser(UserClient *);
     void removeUser(UserClient *);
     bool isIngame();
