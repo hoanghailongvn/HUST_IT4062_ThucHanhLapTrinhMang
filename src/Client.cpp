@@ -629,7 +629,7 @@ void Client::msg_handle(char *message) {
                 splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_TARGET));
                 break;
             case END_GAME:
-                for(int i = 0; i < msg_length.at(UPDATE_GAME); i++) {
+                for(int i = 0; i < msg_length.at(END_GAME); i++) {
                     temp += splited_line.at(i) + "\n";
                 }
                 strcpy(c_temp, temp.c_str());
