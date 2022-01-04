@@ -41,15 +41,18 @@ string RoomWindow::getName() {
 }
 
 vector<string> RoomWindow::getUsernameList() {
-    vector<string> res;
-    for(int i = 0; this->userNameList.size(); i++) {
+    return this->userNameList;
+}
+
+int RoomWindow::getNumberPlayer() {
+    int res = 0;
+    for(int i = 0; i < this->userNameList.size(); i++) {
         if(this->userNameList.at(i).length() > 0) {
-            res.push_back(this->userNameList.at(i));
+            res ++;
         } else {
             break;
         }
     }
-
     return res;
 }
 
@@ -138,9 +141,9 @@ bool RoomWindow::startPressed(char *message) {
 }
 
 bool RoomWindow::startable() {
-    if (this->userNameList.at(1).length() == 0){
-        return false;
-    }
+    // if (this->userNameList.at(1).length() == 0){
+    //     return false;
+    // }
     bool res = true;
     for (int i = 1; i < 4; i++) {
         if (this->userNameList.at(i).length() > 0) {

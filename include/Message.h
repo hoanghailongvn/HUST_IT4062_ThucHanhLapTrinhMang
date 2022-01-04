@@ -20,6 +20,7 @@ RQ_READY, RQ_START,
 START,
 RQ_ACTION,
 UPDATE_GAME, UPDATE_TARGET, 
+END_GAME,
 RQ_EXIT_ROOM};
 
 enum Action {UP, DOWN, LEFT, RIGHT, SPACE};
@@ -135,6 +136,11 @@ struct update_target {
     std::string target;
 };
 
+struct end_game {
+    MessageType type = END_GAME;
+    std::vector<int> point;
+};
+
 void struct_to_message(void *p, MessageType type, char *output);
 
 rq_register message_to_rq_register(char *message);
@@ -158,6 +164,7 @@ update_room message_to_update_room(char *message);
 update_game message_to_update_game(char *message);
 update_target message_to_update_target(char *message);
 rq_action message_to_rq_action(char *message);
+end_game message_to_end_game(char *message);
 
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<std::string> split(char *input, std::string delimiter);

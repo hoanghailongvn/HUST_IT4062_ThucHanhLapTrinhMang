@@ -46,15 +46,18 @@ public:
     static void rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&userClient);
     static void rq_ready(UserClient *&userClient);
     static void rq_start(Room *room);
+    static void rq_action(char *rq_action, UserClient *&userClient);
     static void disconnect(UserClient *&userClient);
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);
     static struct update_game to_struct_update_game(Room *&room);
+    static struct update_target to_struct_update_target(Room *&room);
     static void updateLobby();
     static void updateLobby(UserClient *&userClient);
     static void updateRoom(Room *&room);
     static void updateGame(Room *&room);
+    static void updateTarget(Room *&room);
     static void deleteEmptyRoom();
 
     static void rcvFromClient(int connfd, char *rcv_message);

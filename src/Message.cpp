@@ -299,6 +299,23 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
+    case END_GAME: 
+    {
+        auto *struct_obj = (end_game *)p;
+        final << struct_obj->type << "\n";
+
+        int nb_user = struct_obj->point.size();
+
+        for(int i = 0; i < nb_user - 1; i++) {
+            final << struct_obj->point.at(i) << " ";
+        }
+        final << struct_obj->point.at(nb_user - 1) << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+        
+    }
     default:
         break;
     }
@@ -533,6 +550,23 @@ rq_action message_to_rq_action(char *message) {
     auto splitted_line = split(message, "\n");
     rq_action res;
     res.action = (Action)stoi(splitted_line.at(1));
+    return res;
+}
+
+end_game message_to_end_game(char *message) {
+    auto splited_line = split(message, "\n");
+    end_game res;
+    
+    char temp[BUFF_SIZE + 1];
+    memset(temp, 0, sizeof(temp));
+    
+    //x
+    strcpy(temp, splited_line.at(1).c_str());
+    auto splited_temp = split(temp, " ");
+    for (auto point: splited_temp) {
+        res.point.push_back(stoi(point));
+    }
+    
     return res;
 }
 

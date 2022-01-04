@@ -313,8 +313,18 @@ void Server::rq_start(Room *room) {
     for (auto client:room->getListUser()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
+    Server::updateTarget(room);
 
     Server::updateLobby();
+}
+
+void Server::rq_action(char *rq_action, UserClient *&userClient) {
+    struct rq_action rq = message_to_rq_action(rq_action);
+    Room *room = userClient->getRoom();
+    if (room->getGame()->receivAction(rq, userClient)) {
+        Server::updateTarget(room);
+    }
+    Server::updateGame(room);
 }
 
 struct update_lobby Server::to_struct_update_lobby() {
@@ -344,6 +354,12 @@ struct update_game Server::to_struct_update_game(Room *&room) {
     res.point = room->getGame()->getPoint();
     res.nb_word_done = room->getGame()->getNbWordDone();
     res.time_left = room->getGame()->getTimeLeft();
+    return res;
+}
+
+struct update_target Server::to_struct_update_target(Room *&room) {
+    struct update_target res;
+    res.target = room->getGame()->getTarget();
     return res;
 }
 
@@ -389,6 +405,15 @@ void Server::updateGame(Room *&room) {
     char send_msg[BUFF_SIZE + 1];
     struct_to_message(&res, UPDATE_GAME, send_msg);
 
+    for (auto client: room->getListUser()) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
+}
+
+void Server::updateTarget(Room *&room) {
+    struct update_target res = Server::to_struct_update_target(room);
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&res, UPDATE_TARGET, send_msg);
     for (auto client: room->getListUser()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
@@ -485,6 +510,11 @@ void* Server::routine1(void *input) {
 
         case RQ_START:
             Server::rq_start(userClient->getRoom());
+            break;
+        
+        case RQ_ACTION:
+            Server::rq_action(rcv_message, userClient);
+            break;
         default:
             break;
         }

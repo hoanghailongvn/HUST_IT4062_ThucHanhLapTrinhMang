@@ -304,6 +304,17 @@ void Client::pollEvents()
 
                 break;
             }
+        case GAME:
+            switch (ev.type)
+            {
+            case sf::Event::KeyPressed:
+                this->gameWindow->keyPressed(ev, send_msg);
+                this->sendToServer(this->clientfd, send_msg);
+                break;
+            
+            default:
+                break;
+            }
         default:
             break;
         }
@@ -384,7 +395,7 @@ void Client::render()
         this->roomWindow->drawTo(*this->window);
         break;
     case GAME:
-        // this->gameWindow->drawTo(*this->window);
+        this->gameWindow->drawTo(*this->window);
         break;
     default:
         break;
@@ -497,7 +508,7 @@ void Client::rp_joinRoom(char *message) {
 }
 
 void Client::rp_start_game() {
-    this->gameWindow->setUsernameList(this->roomWindow->getUsernameList());
+    this->gameWindow->setNumberPlayer(this->roomWindow->getNumberPlayer());
     this->state = GAME;
 }
 

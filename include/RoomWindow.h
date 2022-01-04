@@ -39,6 +39,7 @@ public:
 
     std::string getName();
     std::vector<std::string> getUsernameList();
+    int getNumberPlayer();
     void setName(std::string name);
 
     bool backPressed(char *message);
