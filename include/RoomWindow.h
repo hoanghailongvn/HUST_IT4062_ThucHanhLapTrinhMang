@@ -38,6 +38,7 @@ public:
     void drawTo(sf::RenderTarget &target);
 
     std::string getName();
+    std::vector<std::string> getUsernameList();
     void setName(std::string name);
 
     bool backPressed(char *message);

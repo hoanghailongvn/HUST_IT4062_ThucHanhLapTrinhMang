@@ -1,15 +1,18 @@
 #include "../include/Server.h"
+#include "../include/Game.h"
 #include <algorithm>
 
 using namespace std;
 
 vector<User *> Server::listUser;
 vector<Room *> Server::listRoom;
+vector<string> Server::listTarget;
 vector<UserClient *> Server::listClient;
 
 Server::Server()
 {
     this->loadUserData(userDataPath);
+    this->loadTarget(targetPath);
 
     this->listenfd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->listenfd == -1) {
@@ -55,6 +58,14 @@ void Server::run()
     struct sockaddr_in clientAddr;
     int connfd1, connfd2;
     socklen_t clientAddrLen = sizeof(struct sockaddr_in);
+
+    pthread_t new_time_thread;
+    if(pthread_create(&new_time_thread, nullptr, Server::time_routine, nullptr) < 0) {
+            perror("Could not create thread: ");
+            exit(1);
+    }
+    this->threads.push_back(new_time_thread);
+
 
     while (1) {
         // Accept request
@@ -111,6 +122,15 @@ void Server::loadUserData(string path)
 
         User* user = new User(username, password);
         Server::listUser.push_back(user);
+    }
+    ReadFile.close();
+}
+
+void Server::loadTarget(string path) {
+    ifstream ReadFile(path);
+    string line;
+    while (getline(ReadFile, line)) {
+        Server::listTarget.push_back(line);
     }
     ReadFile.close();
 }
@@ -246,6 +266,9 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
     if (room_target == nullptr) {
         rp.accept = false;
         rp.notification = "Room name not exist!!";
+    } else if (room_target->isIngame()) {
+        rp.accept = false;
+        rp.notification = "Ingame";
     } else if(room_target->getNumberUser() == 4) {
         rp.accept = false;
         rp.notification = "Full!";
@@ -281,6 +304,8 @@ void Server::rq_ready(UserClient *&userClient) {
 }
 
 void Server::rq_start(Room *room) {
+    room->startGame();
+
     struct start rp;
     char send_msg[BUFF_SIZE + 1];
     struct_to_message(&rp, START, send_msg);
@@ -288,6 +313,8 @@ void Server::rq_start(Room *room) {
     for (auto client:room->getListUser()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
+
+    Server::updateLobby();
 }
 
 struct update_lobby Server::to_struct_update_lobby() {
@@ -307,6 +334,16 @@ struct update_room Server::to_struct_update_room(Room *&room) {
         res.username.push_back(user->getUser()->getUsername());
         res.ready = room->getReady();
     }
+    return res;
+}
+
+struct update_game Server::to_struct_update_game(Room *&room) {
+    struct update_game res;
+    res.x = room->getGame()->getX();
+    res.y = room->getGame()->getY();
+    res.point = room->getGame()->getPoint();
+    res.nb_word_done = room->getGame()->getNbWordDone();
+    res.time_left = room->getGame()->getTimeLeft();
     return res;
 }
 
@@ -347,6 +384,15 @@ void Server::updateRoom(Room *&room) {
     }
 }
 
+void Server::updateGame(Room *&room) {
+    struct update_game res = Server::to_struct_update_game(room);
+    char send_msg[BUFF_SIZE + 1];
+    struct_to_message(&res, UPDATE_GAME, send_msg);
+
+    for (auto client: room->getListUser()) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
+}
 
 void Server::rcvFromClient(int connfd, char *rcv_message) {
     int rcvBytes = recv(connfd, rcv_message, BUFF_SIZE, 0);
@@ -444,6 +490,20 @@ void* Server::routine1(void *input) {
         }
     }
     close(connfd);
+
+    return nullptr;
+}
+
+void *Server::time_routine(void *) {
+    while(true) {
+        for(auto room:Server::listRoom) {
+            if (room->isIngame()) {
+                room->getGame()->secondPass();
+                Server::updateGame(room);
+            }
+        }
+        sleep(1);
+    }
 
     return nullptr;
 }

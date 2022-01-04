@@ -6,16 +6,18 @@
 #include <string>
 
 class UserClient;
+class Game;
 
 class Room {
-    protected:
+private:
     std::string name;
     std::vector<UserClient *> listUser;
     std::vector<bool> ready;
     bool ingame = false;
     void setup(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
 
-    public:
+    Game *game;
+public:
     Room();
     Room(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
     ~Room();
@@ -25,11 +27,14 @@ class Room {
     std::string getName();
     std::vector<UserClient *> getListUser();
     std::vector<bool> getReady();
+    Game* getGame();
     void setReady(UserClient *);
     void setReady(UserClient *, bool ready);
     void addUser(UserClient *);
     void removeUser(UserClient *);
     bool isIngame();
+    void startGame();
+
 };
 
 #endif

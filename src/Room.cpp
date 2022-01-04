@@ -1,5 +1,6 @@
 #include "../include/Room.h"
 #include "../include/UserClient.h"
+#include "../include/Game.h"
 
 using namespace std;
 
@@ -55,6 +56,10 @@ vector<bool> Room::getReady() {
     return this->ready;
 }
 
+Game* Room::getGame() {
+    return this->game;
+}
+
 
 void Room::removeUser(UserClient *userClient) {
     for(int i = 0; i < this->listUser.size(); i++) {
@@ -80,4 +85,10 @@ UserClient* Room::getHost() {
 
 bool Room::isIngame() {
     return this->ingame;
+}
+
+void Room::startGame() {
+    this->game = new Game(this->listUser);
+    this->ingame = true;
+
 }

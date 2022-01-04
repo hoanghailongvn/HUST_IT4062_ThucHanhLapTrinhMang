@@ -34,6 +34,8 @@ public:
     Server();
     ~Server();
 
+    static std::vector<std::string> listTarget;
+
     void run();
 
     static void rq_register(char *rq_register, char *rp_register);
@@ -48,17 +50,21 @@ public:
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);
+    static struct update_game to_struct_update_game(Room *&room);
     static void updateLobby();
     static void updateLobby(UserClient *&userClient);
     static void updateRoom(Room *&room);
+    static void updateGame(Room *&room);
     static void deleteEmptyRoom();
 
     static void rcvFromClient(int connfd, char *rcv_message);
     static void sendToClient(int connfd, char *send_message);
     void loadUserData(std::string path);
+    void loadTarget(std::string path);
 
     static void* routine1(void *);
     static void* routine2(void *);
+    static void* time_routine(void *);
 };
 
 

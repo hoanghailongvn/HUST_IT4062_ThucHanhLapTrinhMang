@@ -40,6 +40,19 @@ string RoomWindow::getName() {
     return this->name;
 }
 
+vector<string> RoomWindow::getUsernameList() {
+    vector<string> res;
+    for(int i = 0; this->userNameList.size(); i++) {
+        if(this->userNameList.at(i).length() > 0) {
+            res.push_back(this->userNameList.at(i));
+        } else {
+            break;
+        }
+    }
+
+    return res;
+}
+
 void RoomWindow::setName(string name) {
     this->name = name;
 }

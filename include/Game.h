@@ -5,51 +5,37 @@
 #include <iostream>
 #include <vector>
 
-#include <SFML/Audio.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Network.hpp>
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-
-enum Action {UP, DOWN, LEFT, RIGHT, SPACE};
+#include "UserClient.h"
+#include "GameConfig.h"
+#include "Game.h"
 
 class Game {
 private:
-
     // Game logic
+    std::vector<UserClient *> listUser;
+    std::vector<int> x; // 0 - 5
+    std::vector<int> y; // 0 - 4
+    std::vector<int> point;
+    std::vector<int> nb_word_done;
+
+    int time_left; //60
+    std::string target;
     bool endGame;
-    unsigned points;
-    unsigned health;
-    float enemySpawnTimer;
-    float enemySpawnTimerMax;
-    int maxEnemies;
-    bool mouseHeld;
-
-    //Game objects
-    std::vector<sf::RectangleShape> enemies;
-    sf::RectangleShape enemy;
-
-    //Private functions
-    void initVariables();
-    void initWindow();
-    void initEnemies();
-
 public:
-    Game();
+    Game(std::vector<UserClient *>);
     virtual ~Game();
 
-    // Accessors
-    const bool running() const;
     const bool getEndGame() const;
 
+    std::vector<int> getX();
+    std::vector<int> getY();
+    std::vector<int> getPoint();
+    std::vector<int> getNbWordDone();
+    int getTimeLeft(); 
+
     // Functions
-    void spawnEnemy();
-    void pollEvents();
-    void updateMousePositions();
-    void update();
-    void updateEnemies();
-    void renderEnemies();
-    void render();
+    void updateRandomTarget();
+    void secondPass();
 };
 
 #endif

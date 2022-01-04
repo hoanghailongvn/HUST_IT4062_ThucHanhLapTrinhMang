@@ -4,6 +4,8 @@
 
 
 int main() {
+    srand(static_cast<unsigned>(time(NULL)));
+    
     Server *server = new Server();
     server->run();
     return 0;

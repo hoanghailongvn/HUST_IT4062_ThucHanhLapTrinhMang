@@ -59,6 +59,10 @@ void Client::initJoinWindow() {
     this->joinWindow = new JoinWindow(this->font);
 }
 
+void Client::initGameWindow() {
+    this->gameWindow = new GameWindow(this->font);
+}
+
 void Client::initRoomWindow() {
     this->roomWindow = new RoomWindow(this->font);
 }
@@ -84,6 +88,7 @@ Client::Client()
     this->initCreateRoomWindow();
     this->initJoinWindow();
     this->initRoomWindow();
+    this->initGameWindow();
 }
 
 Client::~Client()
@@ -378,6 +383,9 @@ void Client::render()
     case ROOM:
         this->roomWindow->drawTo(*this->window);
         break;
+    case GAME:
+        // this->gameWindow->drawTo(*this->window);
+        break;
     default:
         break;
     }
@@ -467,6 +475,16 @@ void Client::rp_update_room(char *message) {
     this->roomWindow->updateRoom(rp, this->userClient);
 }
 
+void Client::rp_update_game(char *message) {
+    struct update_game rp = message_to_update_game(message);
+    this->gameWindow->updateGame(rp);
+}
+
+void Client::rp_update_target(char *message) {
+    struct update_target rp = message_to_update_target(message);
+    this->gameWindow->updateTarget(rp);
+}
+
 void Client::rp_joinRoom(char *message) {
     struct rp_join_room rp = message_to_rp_join_room(message);
     if (rp.accept) {
@@ -476,6 +494,11 @@ void Client::rp_joinRoom(char *message) {
         this->state = NOTIFICATION;
         this->next_state = LOBBY;
     }
+}
+
+void Client::rp_start_game() {
+    this->gameWindow->setUsernameList(this->roomWindow->getUsernameList());
+    this->state = GAME;
 }
 
 void Client::run() {
@@ -530,6 +553,15 @@ void * Client::routine2(void *c) {
             break;
         case UPDATE_ROOM:
             client->rp_update_room(rcv_message);
+            break;
+        case START:
+            client->rp_start_game();
+            break;
+        case UPDATE_GAME:
+            client->rp_update_game(rcv_message);
+            break;
+        case UPDATE_TARGET:
+            client->rp_update_target(rcv_message);
             break;
         default:
             break;

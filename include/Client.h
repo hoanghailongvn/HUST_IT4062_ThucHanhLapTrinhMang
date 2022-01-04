@@ -23,6 +23,7 @@
 #include "../include/JoinWindow.h"
 #include "../include/RoomWindow.h"
 #include "../include/UserClient.h"
+#include "../include/GameWindow.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -36,7 +37,7 @@ enum StateTypes
     CREATEROOM,
     JOIN,
     ROOM,
-    PLAY,
+    GAME,
     NOTIFICATION,
 };
 
@@ -71,6 +72,7 @@ private:
     CreateRoomWindow *createRoomWindow;
     JoinWindow *joinWindow;
     RoomWindow *roomWindow;
+    GameWindow *gameWindow;
 
 
     void initNetwork();
@@ -84,6 +86,7 @@ private:
     void initCreateRoomWindow();
     void initJoinWindow();
     void initRoomWindow();
+    void initGameWindow();
     void initFont();
 
 public:
@@ -111,6 +114,9 @@ public:
     void rp_joinRoom(char *rq_message);
     void rp_update_lobby(char *message);
     void rp_update_room(char *message);
+    void rp_update_game(char *message);
+    void rp_update_target(char *message);
+    void rp_start_game();
 
     static void* routine1(void *);
     static void* routine2(void *); 

@@ -239,6 +239,66 @@ void struct_to_message(void *p, MessageType type, char *output) {
         strcpy(output, temp.c_str());
         break;
     }
+    case UPDATE_GAME:
+    {
+        auto *struct_obj = (update_game *)p;
+        final << struct_obj->type << "\n";
+
+        int nb_user = struct_obj->x.size();
+
+        //time left
+        final << struct_obj->time_left << "\n";
+
+        //x
+        for(int i = 0; i < nb_user - 1; i++) {
+            final << struct_obj->x.at(i) << " ";
+        }
+        final << struct_obj->x.at(nb_user - 1) << "\n";
+
+        //y
+        for(int i = 0; i < nb_user - 1; i++) {
+            final << struct_obj->y.at(i) << " ";
+        }
+        final << struct_obj->y.at(nb_user - 1) << "\n";
+
+        //nb word done
+        for(int i = 0; i < nb_user - 1; i++) {
+            final << struct_obj->nb_word_done.at(i) << " ";
+        }
+        final << struct_obj->nb_word_done.at(nb_user - 1) << "\n";
+
+        //point
+        for(int i = 0; i < nb_user - 1; i++) {
+            final << struct_obj->point.at(i) << " ";
+        }
+        final << struct_obj->point.at(nb_user - 1) << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
+    case RQ_ACTION:
+    {
+        auto *struct_obj = (rq_action *)p;
+        final << struct_obj->type << "\n";
+
+        final << struct_obj->action << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
+    case UPDATE_TARGET:
+    {
+        auto *struct_obj = (update_target *)p;
+        final << struct_obj->type << "\n";
+
+        final << struct_obj->target << "\0";
+
+        temp = final.str();
+        strcpy(output, temp.c_str());
+        break;
+    }
     default:
         break;
     }
@@ -418,9 +478,68 @@ update_room message_to_update_room(char *message) {
     return res;
 }
 
+update_game message_to_update_game(char *message) {
+    auto splited_line = split(message, "\n");
+    update_game res;
+
+    //time left
+    res.time_left = stoi(splited_line.at(1));
+
+    char temp[BUFF_SIZE + 1];
+    memset(temp, 0, sizeof(temp));
+    
+    //x
+    strcpy(temp, splited_line.at(2).c_str());
+    auto splited_temp = split(temp, " ");
+    for (auto x: splited_temp) {
+        res.x.push_back(stoi(x));
+    }
+
+    //y
+    memset(temp, 0, sizeof(temp));
+
+    strcpy(temp, splited_line.at(3).c_str());
+    splited_temp = split(temp, " ");
+    for (auto y: splited_temp) {
+        res.y.push_back(stoi(y));
+    }
+
+    //so chu da hoan thanh
+    memset(temp, 0, sizeof(temp));
+    strcpy(temp, splited_line.at(4).c_str());
+    splited_temp = split(temp, " ");
+    for (auto nb_word_done: splited_temp) {
+        res.nb_word_done.push_back(stoi(nb_word_done));
+    }
+
+    // point
+    memset(temp, 0, sizeof(temp));
+    strcpy(temp, splited_line.at(5).c_str());
+    splited_temp = split(temp, " ");
+    for (auto point: splited_temp) {
+        res.point.push_back(stoi(point));
+    }
+
+    return res;
+}
+update_target message_to_update_target(char *message) {
+    auto splited_line = split(message, "\n");
+    update_target res;
+
+    res.target = splited_line.at(1);
+    return res;
+}
+rq_action message_to_rq_action(char *message) {
+    auto splitted_line = split(message, "\n");
+    rq_action res;
+    res.action = (Action)stoi(splitted_line.at(1));
+    return res;
+}
+
 int getCode(char *input) {
     auto splited_line = split(input, "\n");
     int res = stoi(splited_line.at(0));
 
     return res;
 }
+

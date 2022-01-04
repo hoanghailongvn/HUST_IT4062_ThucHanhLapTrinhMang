@@ -7,7 +7,6 @@
 #include <iostream>
 #include <vector>
 #include "GameConfig.h"
-#include "Game.h"
 
 enum MessageType {
 RQ_EXIT = 0, 
@@ -22,6 +21,8 @@ START,
 RQ_ACTION,
 UPDATE_GAME, UPDATE_TARGET, 
 RQ_EXIT_ROOM};
+
+enum Action {UP, DOWN, LEFT, RIGHT, SPACE};
 
 struct rq_exit {
     MessageType type = RQ_EXIT;
@@ -115,6 +116,25 @@ struct start {
     MessageType type = START;
 };
 
+struct rq_action {
+    MessageType type = RQ_ACTION;
+    Action action;
+};
+
+struct update_game {
+    MessageType type = UPDATE_GAME;
+    int time_left;
+    std::vector<int> x;
+    std::vector<int> y;
+    std::vector<int> nb_word_done;
+    std::vector<int> point;
+};
+
+struct update_target {
+    MessageType type = UPDATE_TARGET;
+    std::string target;
+};
+
 void struct_to_message(void *p, MessageType type, char *output);
 
 rq_register message_to_rq_register(char *message);
@@ -134,6 +154,10 @@ rp_join_room message_to_rp_join_room(char *message);
 
 update_lobby message_to_update_lobby(char *message);
 update_room message_to_update_room(char *message);
+
+update_game message_to_update_game(char *message);
+update_target message_to_update_target(char *message);
+rq_action message_to_rq_action(char *message);
 
 //Phân tách input bằng delimiter và trả về vector 
 std::vector<std::string> split(char *input, std::string delimiter);
