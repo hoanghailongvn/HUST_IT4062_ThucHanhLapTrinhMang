@@ -25,6 +25,8 @@ RQ_EXIT_ROOM};
 
 enum Action {UP, DOWN, LEFT, RIGHT, SPACE};
 
+extern std::vector<int> msg_length;
+
 struct rq_exit {
     MessageType type = RQ_EXIT;
 };
@@ -109,10 +111,6 @@ struct rq_start{
     MessageType type = RQ_START;
 };
 
-struct rq_exit_room {
-    MessageType type = RQ_EXIT_ROOM;
-};
-
 struct start {
     MessageType type = START;
 };
@@ -136,11 +134,14 @@ struct update_target {
     std::string target;
 };
 
-//sorted
 struct end_game {
     MessageType type = END_GAME;
     std::vector<int> point;
     std::vector<std::string> username;
+};
+
+struct rq_exit_room {
+    MessageType type = RQ_EXIT_ROOM;
 };
 
 void struct_to_message(void *p, MessageType type, char *output);
@@ -172,5 +173,7 @@ end_game message_to_end_game(char *message);
 std::vector<std::string> split(char *input, std::string delimiter);
 
 int getCode(char *input);
+
+
 
 #endif

@@ -238,7 +238,6 @@ void Server::rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient 
             rp.roomname = rq.name;
 
             Server::updateRoom(newRoom);
-            sleep(0.2);
             Server::updateLobby();
 
         }
@@ -279,7 +278,6 @@ void Server::rq_joinRoom(char *rq_joinRoom, char *rp_joinRoom, UserClient *&user
         userClient->setRoom(room_target);
 
         Server::updateLobby();
-        sleep(0.1);
         Server::updateRoom(room_target);
     }
 

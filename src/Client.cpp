@@ -569,31 +569,9 @@ void * Client::routine2(void *c) {
 
     char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
     
-    int exit_check = false;
-    while (!exit_check) {
+    while (true) {
         client->rcvFromServer(connfd, rcv_message);
-        switch (getCode(rcv_message)) {
-        case UPDATE_LOBBY:
-            client->rp_update_lobby(rcv_message);
-            break;
-        case UPDATE_ROOM:
-            client->rp_update_room(rcv_message);
-            break;
-        case START:
-            client->rp_start_game();
-            break;
-        case UPDATE_GAME:
-            client->rp_update_game(rcv_message);
-            break;
-        case UPDATE_TARGET:
-            client->rp_update_target(rcv_message);
-            break;
-        case END_GAME:
-            client->rp_end_game(rcv_message);
-            break;
-        default:
-            break;
-        }
+        client->msg_handle(rcv_message);
     }
     close(connfd);
 
@@ -602,4 +580,65 @@ void * Client::routine2(void *c) {
 
 UserClient* Client::getUserClient() {
     return this->userClient;
+}
+
+void Client::msg_handle(char *message) {
+    auto splited_line = split(message, "\n");
+
+    string temp;
+    char c_temp[BUFF_SIZE + 1];
+
+    while(splited_line.size() > 1) {
+        temp = "";
+        switch (stoi(splited_line.at(0)))
+        {
+            case UPDATE_LOBBY:
+                for(int i = 0; i < msg_length.at(UPDATE_LOBBY); i++) {
+                    temp += splited_line.at(i) + "\n";
+                }
+                strcpy(c_temp, temp.c_str());
+                this->rp_update_lobby(c_temp);
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_LOBBY));
+                break;
+            case UPDATE_ROOM:
+                for(int i = 0; i < msg_length.at(UPDATE_ROOM); i++) {
+                    temp += splited_line.at(i) + "\n";
+                }
+                strcpy(c_temp, temp.c_str());
+                this->rp_update_room(c_temp);
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_ROOM));
+                break;
+            case START:
+                this->rp_start_game();
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(START));
+                break;
+            case UPDATE_GAME:
+                for(int i = 0; i < msg_length.at(UPDATE_GAME); i++) {
+                    temp += splited_line.at(i) + "\n";
+                }
+                strcpy(c_temp, temp.c_str());
+                this->rp_update_game(c_temp);
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_GAME));
+                break;
+            case UPDATE_TARGET:
+                for(int i = 0; i < msg_length.at(UPDATE_TARGET); i++) {
+                    temp += splited_line.at(i) + "\n";
+                }
+                strcpy(c_temp, temp.c_str());
+                this->rp_update_target(c_temp);
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_TARGET));
+                break;
+            case END_GAME:
+                for(int i = 0; i < msg_length.at(UPDATE_GAME); i++) {
+                    temp += splited_line.at(i) + "\n";
+                }
+                strcpy(c_temp, temp.c_str());
+                this->rp_end_game(c_temp);
+                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(END_GAME));
+                break;
+            default:
+                break;
+        }
+    }
+
 }

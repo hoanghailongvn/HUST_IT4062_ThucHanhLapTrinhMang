@@ -2,6 +2,22 @@
 
 using namespace std;
 
+std::vector<int> msg_length
+{1, //RQ_EXIT
+3, 3, //RQ_REGISTER, RP_REGISTER
+3, 4,//RQ_LOGIN, RP_LOGIN
+1, 3,//RQ_LOGOUT, RP_LOGOUT
+2, 4,//RQ_CREATE_ROOM, RP_CREATE_ROOM
+2, 3,//RQ_JOIN_ROOM, RP_JOIN_ROOM
+4, 4,//UPDATE_LOBBY, UPDATE_ROOM
+1, 1,//RQ_READY, RQ_START
+1,//START
+2,//RQ_ACTION,
+6, 2,//UPDATE_GAME, UPDATE_TARGET, 
+3,//END_GAME,
+1,//RQ_EXIT_ROOM
+};
+
 vector<string> split(char *input, string delimiter) {
     vector<string> res;
 
@@ -27,7 +43,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_EXIT:
     {
         auto *struct_obj = (rq_exit *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -37,7 +53,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rq_register *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->username << "\n";
-        final << struct_obj->password << "\0";
+        final << struct_obj->password << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -48,7 +64,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rp_register *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
-        final << struct_obj->notification << "\0";
+        final << struct_obj->notification << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -59,7 +75,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rq_login *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->username << "\n";
-        final << struct_obj->password << "\0";
+        final << struct_obj->password << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -71,7 +87,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
         final << struct_obj->notification << "\n";
-        final << struct_obj->username << "\0";
+        final << struct_obj->username << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -81,7 +97,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_LOGOUT:
     {
         auto *struct_obj = (rq_logout *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -92,7 +108,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rp_logout *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
-        final << struct_obj->notification << "\0";
+        final << struct_obj->notification << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -102,7 +118,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     {
         auto *struct_obj = (rq_create_room *)p;
         final << struct_obj->type << "\n";
-        final << struct_obj->name << "\0";
+        final << struct_obj->name << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -114,7 +130,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
         final << struct_obj->notification << "\n";
-        final << struct_obj->roomname << "\0";
+        final << struct_obj->roomname << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -124,7 +140,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     {
         auto *struct_obj = (rq_join_room *)p;
         final << struct_obj->type << "\n";
-        final << struct_obj->room_name << "\0";
+        final << struct_obj->room_name << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -135,7 +151,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rp_join_room *)p;
         final << struct_obj->type << "\n";
         final << struct_obj->accept << "\n";
-        final << struct_obj->notification << "\0";
+        final << struct_obj->notification << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -165,9 +181,9 @@ void struct_to_message(void *p, MessageType type, char *output) {
             for (int i = 0; i < nb_room - 1; i++) {
                 final << struct_obj->ingame.at(i) << " ";
             }
-            final << struct_obj->ingame.at(nb_room - 1) << "\0";
+            final << struct_obj->ingame.at(nb_room - 1) << "\n\0";
         } else {
-            final << "\n" << "\n" << "\0";
+            final << "\n" << "\n" << "\n\0";
         }
         
 
@@ -196,10 +212,10 @@ void struct_to_message(void *p, MessageType type, char *output) {
             for (int i = 0; i < nb_user - 1; i++) {
                 final << struct_obj->ready.at(i) << " ";
             }
-            final << struct_obj->ready.at(nb_user - 1) << "\0";
+            final << struct_obj->ready.at(nb_user - 1) << "\n\0";
 
         } else {
-            final << "\n" << "\n" << "\n" << "\0";
+            final << "\n" << "\n" << "\n" << "\n\0";
         }
         
 
@@ -210,7 +226,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_EXIT_ROOM:
     {
         auto *struct_obj = (rq_exit_room *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -218,7 +234,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_READY:
     {
         auto *struct_obj = (rq_ready *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -226,7 +242,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case RQ_START:
     {
         auto *struct_obj = (rq_start *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -234,7 +250,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
     case START:
     {
         auto *struct_obj = (start *)p;
-        final << struct_obj->type << "\0";
+        final << struct_obj->type << "\n\0";
         temp = final.str();
         strcpy(output, temp.c_str());
         break;
@@ -271,7 +287,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         for(int i = 0; i < nb_user - 1; i++) {
             final << struct_obj->point.at(i) << " ";
         }
-        final << struct_obj->point.at(nb_user - 1) << "\0";
+        final << struct_obj->point.at(nb_user - 1) << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -282,7 +298,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (rq_action *)p;
         final << struct_obj->type << "\n";
 
-        final << struct_obj->action << "\0";
+        final << struct_obj->action << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -293,7 +309,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         auto *struct_obj = (update_target *)p;
         final << struct_obj->type << "\n";
 
-        final << struct_obj->target << "\0";
+        final << struct_obj->target << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
@@ -316,7 +332,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
         for(int i = 0; i < nb_user - 1; i++) {
             final << struct_obj->point.at(i) << " ";
         }
-        final << struct_obj->point.at(nb_user - 1) << "\0";
+        final << struct_obj->point.at(nb_user - 1) << "\n\0";
 
         temp = final.str();
         strcpy(output, temp.c_str());
