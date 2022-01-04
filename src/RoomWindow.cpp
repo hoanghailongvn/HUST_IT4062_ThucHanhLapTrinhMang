@@ -141,9 +141,9 @@ bool RoomWindow::startPressed(char *message) {
 }
 
 bool RoomWindow::startable() {
-    // if (this->userNameList.at(1).length() == 0){
-    //     return false;
-    // }
+    if (this->userNameList.at(1).length() == 0){
+        return false;
+    }
     bool res = true;
     for (int i = 1; i < 4; i++) {
         if (this->userNameList.at(i).length() > 0) {
