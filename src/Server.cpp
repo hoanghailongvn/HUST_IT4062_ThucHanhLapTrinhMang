@@ -322,7 +322,11 @@ void Server::rq_action(char *rq_action, UserClient *&userClient) {
     struct rq_action rq = message_to_rq_action(rq_action);
     Room *room = userClient->getRoom();
     if (room->getGame()->receivAction(rq, userClient)) {
-        Server::updateTarget(room);
+        if(room->getGame()->isEndGame()) {
+            Server::endGame(room);
+        } else {
+            Server::updateTarget(room);
+        }
     }
     Server::updateGame(room);
 }
@@ -360,6 +364,15 @@ struct update_game Server::to_struct_update_game(Room *&room) {
 struct update_target Server::to_struct_update_target(Room *&room) {
     struct update_target res;
     res.target = room->getGame()->getTarget();
+    return res;
+}
+
+struct end_game Server::to_struct_end_game(Room *&room) {
+    struct end_game res;
+    res.point = room->getGame()->getPoint();
+    for(int i = 0; i < res.point.size(); i++) {
+        res.username.push_back(room->getListUser().at(i)->getUser()->getUsername());
+    }
     return res;
 }
 
@@ -417,6 +430,19 @@ void Server::updateTarget(Room *&room) {
     for (auto client: room->getListUser()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
+}
+
+void Server::endGame(Room *&room) {
+    struct end_game res = Server::to_struct_end_game(room);
+    char send_msg[BUFF_SIZE + 1];
+
+    struct_to_message(&res, END_GAME, send_msg);
+    for (auto client:room->getListUser()) {
+        Server::sendToClient(client->getWritefd(), send_msg);
+    }
+    room->setInGame(false);
+    room->resetReady();
+    Server::updateRoom(room);
 }
 
 void Server::rcvFromClient(int connfd, char *rcv_message) {
@@ -530,7 +556,12 @@ void *Server::time_routine(void *) {
             if (room->isIngame()) {
                 room->getGame()->secondPass();
                 Server::updateGame(room);
+                
+                if (room->getGame()->isEndGame()) {
+                    Server::endGame(room);
+                }
             }
+            
         }
         sleep(1);
     }

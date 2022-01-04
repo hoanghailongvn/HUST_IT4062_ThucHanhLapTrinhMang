@@ -46,6 +46,7 @@ public:
     void updateGame(struct update_game rp);
     void updateTarget(struct update_target rp);
     void keyPressed(sf::Event ev, char *send_msg);
+    int getNbPlayer();
 
     void drawTo(sf::RenderTarget &target);
 };

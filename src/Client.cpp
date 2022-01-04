@@ -507,6 +507,20 @@ void Client::rp_joinRoom(char *message) {
     }
 }
 
+void Client::rp_end_game(char *message) {
+    struct end_game res = message_to_end_game(message);
+    this->state = NOTIFICATION;
+    this->next_state = ROOM;
+
+    stringstream notif;
+    
+    for(int i = 0; i < this->gameWindow->getNbPlayer(); i++) {
+        notif << res.username.at(i) << ": " << res.point.at(i) << "\n";
+    }
+
+    this->notification->setText("End Game!!", 50, notif.str(), 30);
+}
+
 void Client::rp_start_game() {
     this->gameWindow->setNumberPlayer(this->roomWindow->getNumberPlayer());
     this->state = GAME;
@@ -573,6 +587,9 @@ void * Client::routine2(void *c) {
             break;
         case UPDATE_TARGET:
             client->rp_update_target(rcv_message);
+            break;
+        case END_GAME:
+            client->rp_end_game(rcv_message);
             break;
         default:
             break;

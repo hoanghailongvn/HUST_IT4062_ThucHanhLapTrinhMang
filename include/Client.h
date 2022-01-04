@@ -117,6 +117,7 @@ public:
     void rp_update_game(char *message);
     void rp_update_target(char *message);
     void rp_start_game();
+    void rp_end_game(char *message);
 
     static void* routine1(void *);
     static void* routine2(void *); 

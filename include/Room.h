@@ -30,6 +30,8 @@ public:
     Game* getGame();
     void setReady(UserClient *);
     void setReady(UserClient *, bool ready);
+    void resetReady();
+    void setInGame(bool);
     void addUser(UserClient *);
     void removeUser(UserClient *);
     bool isIngame();

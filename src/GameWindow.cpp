@@ -75,6 +75,9 @@ GameWindow::~GameWindow(){}
 void GameWindow::setNumberPlayer(int input) {
     this->nb_player = input;
 }
+int GameWindow::getNbPlayer() {
+    return this->nb_player;
+}
 
 void GameWindow::updateGame(struct update_game input) {
     this->x = input.x;

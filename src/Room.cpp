@@ -40,6 +40,13 @@ void Room::setReady(UserClient *userClient, bool ready) {
     }
 }
 
+void Room::resetReady() {
+    int nb_user = this->getListUser().size();
+    for(int i = 0; i < nb_user; i++) {
+        this->ready.at(i) = false;
+    }
+}
+
 string Room::getName() {
     return this->name;
 }
@@ -85,6 +92,9 @@ UserClient* Room::getHost() {
 
 bool Room::isIngame() {
     return this->ingame;
+}
+void Room::setInGame(bool input) {
+    this->ingame = input;
 }
 
 void Room::startGame() {

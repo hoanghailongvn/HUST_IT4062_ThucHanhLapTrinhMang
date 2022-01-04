@@ -136,9 +136,11 @@ struct update_target {
     std::string target;
 };
 
+//sorted
 struct end_game {
     MessageType type = END_GAME;
     std::vector<int> point;
+    std::vector<std::string> username;
 };
 
 void struct_to_message(void *p, MessageType type, char *output);

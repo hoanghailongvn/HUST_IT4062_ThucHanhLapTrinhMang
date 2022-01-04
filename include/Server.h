@@ -53,11 +53,13 @@ public:
     static struct update_room to_struct_update_room(Room *&room);
     static struct update_game to_struct_update_game(Room *&room);
     static struct update_target to_struct_update_target(Room *&room);
+    static struct end_game to_struct_end_game(Room *&room);
     static void updateLobby();
     static void updateLobby(UserClient *&userClient);
     static void updateRoom(Room *&room);
     static void updateGame(Room *&room);
     static void updateTarget(Room *&room);
+    static void endGame(Room *&room);
     static void deleteEmptyRoom();
 
     static void rcvFromClient(int connfd, char *rcv_message);
