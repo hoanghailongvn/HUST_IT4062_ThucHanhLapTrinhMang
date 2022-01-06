@@ -14,7 +14,7 @@ OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 SERVER_OBJECTS = $(OBJDIR)/server.o $(OBJDIR)/Server.o $(OBJDIR)/Room.o $(OBJDIR)/Game.o
 CLIENT_OBJECTS = $(filter-out $(SERVER_OBJECTS), $(OBJECTS))
 
-all: $(BINDIR)/server $(BINDIR)/client $(BINDIR)/sfml
+all: $(BINDIR)/server $(BINDIR)/client
 
 $(BINDIR)/server: $(SERVER_OBJECTS) $(OBJDIR)/Message.o $(OBJDIR)/UserClient.o  $(OBJDIR)/User.o
 	$(CXX) $^ -o $@ -pthread
@@ -27,3 +27,4 @@ $(OBJECTS): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 clear:
 	rm -f $(OBJECTS)
+	rm -f $(wildcard $(BINDIR)/*)
