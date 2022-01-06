@@ -2,14 +2,15 @@
 
 using namespace std;
 
-RoomWindow::RoomWindow(sf::Font *font){
+RoomWindow::RoomWindow(sf::Font* font)
+{
     this->font = font;
 
-    float x_box[4] = {100, 300, 500, 700};
+    float x_box[4] = { 100, 300, 500, 700 };
     float y_box = 200;
     float x_size = 170;
     float y_size = 200;
-    sf::Color listColor[4] = {sf::Color::Red, sf::Color::Blue, sf::Color::Green, sf::Color::Yellow};
+    sf::Color listColor[4] = { sf::Color::Red, sf::Color::Blue, sf::Color::Green, sf::Color::Yellow };
 
     for (int i = 0; i < 4; i++) {
         auto newUserBox = new UserBox(x_box[i], y_box, x_size, y_size, this->font, listColor[i]);
@@ -30,25 +31,29 @@ RoomWindow::RoomWindow(sf::Font *font){
     this->back_btn = new Button(50, 550, 60, 20, font, "Back", 16, sf::Color::Black, sf::Color::Magenta);
 }
 
-RoomWindow::~RoomWindow() {
+RoomWindow::~RoomWindow()
+{
     for (int i = 0; i < 4; i++) {
         delete this->userBoxList.at(i);
     }
 }
 
-string RoomWindow::getName() {
+string RoomWindow::getName()
+{
     return this->name;
 }
 
-vector<string> RoomWindow::getUsernameList() {
+vector<string> RoomWindow::getUsernameList()
+{
     return this->userNameList;
 }
 
-int RoomWindow::getNumberPlayer() {
+int RoomWindow::getNumberPlayer()
+{
     int res = 0;
-    for(int i = 0; i < this->userNameList.size(); i++) {
-        if(this->userNameList.at(i).length() > 0) {
-            res ++;
+    for (int i = 0; i < this->userNameList.size(); i++) {
+        if (this->userNameList.at(i).length() > 0) {
+            res++;
         } else {
             break;
         }
@@ -56,31 +61,30 @@ int RoomWindow::getNumberPlayer() {
     return res;
 }
 
-void RoomWindow::setName(string name) {
+void RoomWindow::setName(string name)
+{
     this->name = name;
 }
 
-void RoomWindow::update(sf::Vector2f mousePos) {
+void RoomWindow::update(sf::Vector2f mousePos)
+{
     this->back_btn->update(mousePos);
-    if (this->isHost) {
-        if (this->startable()) {
-            this->start_btn->update(mousePos);  
-        } else {
+    if (this->isHost)
+        if (this->startable())
+            this->start_btn->update(mousePos);
+        else
             this->start_btn->setColor(sf::Color::Black);
-        }
-             
-    } else {
+    else
         this->ready_btn->update(mousePos);
-    }
-    
 }
 
-void RoomWindow::updateRoom(struct update_room input, UserClient *userClient) {
+void RoomWindow::updateRoom(struct update_room input, UserClient* userClient)
+{
     this->name = input.room_name;
     this->main->setString("Room: " + this->name);
 
     int nb_user = input.username.size();
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         if (i < nb_user) {
             this->userBoxList.at(i)->setup(input.username.at(i), input.ready.at(i));
             this->userNameList.at(i) = input.username.at(i);
@@ -92,14 +96,15 @@ void RoomWindow::updateRoom(struct update_room input, UserClient *userClient) {
         }
     }
 
-    if(this->userNameList.at(0).compare(userClient->getUser()->getUsername()) == 0) {
+    if (this->userNameList.at(0).compare(userClient->getUser()->getUsername()) == 0) {
         this->isHost = true;
     } else {
         this->isHost = false;
     }
 }
 
-void RoomWindow::drawTo(sf::RenderTarget &target) {
+void RoomWindow::drawTo(sf::RenderTarget& target)
+{
     target.draw(*this->main);
     this->back_btn->drawTo(target);
     if (this->isHost) {
@@ -113,7 +118,8 @@ void RoomWindow::drawTo(sf::RenderTarget &target) {
     }
 }
 
-bool RoomWindow::backPressed(char *message) {
+bool RoomWindow::backPressed(char* message)
+{
     if (this->back_btn->isPressed()) {
         rq_exit_room rq;
         struct_to_message(&rq, RQ_EXIT_ROOM, message);
@@ -122,7 +128,8 @@ bool RoomWindow::backPressed(char *message) {
     return false;
 }
 
-bool RoomWindow::readyPressed(char *message) {
+bool RoomWindow::readyPressed(char* message)
+{
     if (this->ready_btn->isPressed()) {
         rq_ready rq;
         struct_to_message(&rq, RQ_READY, message);
@@ -131,7 +138,8 @@ bool RoomWindow::readyPressed(char *message) {
     return false;
 }
 
-bool RoomWindow::startPressed(char *message) {
+bool RoomWindow::startPressed(char* message)
+{
     if (!this->startable()) {
         return false;
     }
@@ -144,8 +152,9 @@ bool RoomWindow::startPressed(char *message) {
     return false;
 }
 
-bool RoomWindow::startable() {
-    if (this->userNameList.at(1).length() == 0){
+bool RoomWindow::startable()
+{
+    if (this->userNameList.at(1).length() == 0) {
         return false;
     }
     bool res = true;
@@ -154,7 +163,7 @@ bool RoomWindow::startable() {
             if (!this->ready.at(i)) {
                 res = false;
                 break;
-            }   
+            }
         } else {
             break;
         }

@@ -24,13 +24,13 @@ private:
     int listenfd;
     struct sockaddr_in servAddr;
 
+    std::vector<pthread_t> threads;
+
+public:
     static std::vector<User *> listUser;
     static std::vector<Room *> listRoom;
     static std::vector<UserClient *> listClient;
 
-    std::vector<pthread_t> threads;
-
-public:
     Server();
     ~Server();
 
@@ -57,10 +57,9 @@ public:
     static struct end_game to_struct_end_game(Room *&room);
     static void updateLobby();
     static void updateLobby(UserClient *&userClient);
-    static void updateRoom(Room *&room);
-    static void updateGame(Room *&room);
-    static void updateTarget(Room *&room);
-    static void endGame(Room *&room);
+    static void updateRoom(Room *room);
+    static void updateGame(Room *room);
+    static void updateTarget(Room *room);
     static void deleteEmptyRoom();
 
     static void rcvFromClient(int connfd, char *rcv_message);

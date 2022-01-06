@@ -323,7 +323,7 @@ void Server::rq_action(char *rq_action, UserClient *&userClient) {
     bool check = true;
     if (room->getGame()->receivAction(rq, userClient)) {
         if(room->getGame()->isEndGame()) {
-            Server::endGame(room);
+            room->endGame();
             check = false;
         } else {
             Server::updateTarget(room);
@@ -407,47 +407,33 @@ void Server::updateLobby(UserClient *&userClient) {
     Server::sendToClient(userClient->getWritefd(), send_msg);
 }
 
-void Server::updateRoom(Room *&room) {
+void Server::updateRoom(Room *room) {
     struct update_room res = Server::to_struct_update_room(room);
     char send_msg[BUFF_SIZE + 1];
     struct_to_message(&res, UPDATE_ROOM, send_msg);
 
-    for (auto client: room->getListUser()) {
+    for (auto client: room->getOnlineClient()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
 }
 
-void Server::updateGame(Room *&room) {
+void Server::updateGame(Room *room) {
     struct update_game res = Server::to_struct_update_game(room);
     char send_msg[BUFF_SIZE + 1];
     struct_to_message(&res, UPDATE_GAME, send_msg);
 
-    for (auto client: room->getListUser()) {
+    for (auto client: room->getOnlineClient()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
 }
 
-void Server::updateTarget(Room *&room) {
+void Server::updateTarget(Room *room) {
     struct update_target res = Server::to_struct_update_target(room);
     char send_msg[BUFF_SIZE + 1];
     struct_to_message(&res, UPDATE_TARGET, send_msg);
-    for (auto client: room->getListUser()) {
+    for (auto client: room->getOnlineClient()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
-}
-
-void Server::endGame(Room *&room) {
-    struct end_game res = Server::to_struct_end_game(room);
-    char send_msg[BUFF_SIZE + 1];
-
-    struct_to_message(&res, END_GAME, send_msg);
-    for (auto client:room->getListUser()) {
-        Server::sendToClient(client->getWritefd(), send_msg);
-    }
-
-    room->endGame();
-    room->resetReady();
-    Server::updateRoom(room);
 }
 
 void Server::rcvFromClient(int connfd, char *rcv_message) {
@@ -474,20 +460,22 @@ void Server::sendToClient(int connfd, char *send_message) {
 }
 
 void Server::disconnect(UserClient *&userClient) {
-    //Delete client from listClient in Server
     Server::listClient.erase(remove(Server::listClient.begin(), Server::listClient.end(), userClient), Server::listClient.end());
-    //Set state of account to offline
     userClient->getUser()->setState(OFFLINE);
-
-    //If user in a room
-    Room *room = userClient->getRoom();
-    if(room != nullptr) {
-        room->removeUser(userClient);
-        Server::updateRoom(room);
-        Server::deleteEmptyRoom();
-        Server::updateLobby();
+    if(userClient->getRoom()->isIngame()) {
+        userClient->getRoom()->userDisconnectWhileInGame(userClient);
+    } else {
+        //If user in a room
+        Room *room = userClient->getRoom();
+        if(room != nullptr) {
+            room->removeUser(userClient);
+            Server::updateRoom(room);
+            Server::deleteEmptyRoom();
+            Server::updateLobby();
+        }
+        delete userClient;
     }
-    delete userClient;
+    
 }
 
 void Server::afk(UserClient *&userClient) {
@@ -567,7 +555,7 @@ void *Server::time_routine(void *) {
                 Server::updateGame(room);
                 
                 if (room->getGame()->isEndGame()) {
-                    Server::endGame(room);
+                    room->endGame();
                 }
             }
             

@@ -12,6 +12,7 @@ class Room {
 private:
     std::string name;
     std::vector<UserClient *> listUser;
+    std::vector<UserClient *> disconnectedClient;
     std::vector<bool> ready;
     bool ingame = false;
     void setup(std::string name, std::vector<UserClient *> listUser, std::vector<bool> ready);
@@ -26,6 +27,7 @@ public:
     UserClient* getHost();
     std::string getName();
     std::vector<UserClient *> getListUser();
+    std::vector<UserClient *> getOnlineClient();
     std::vector<bool> getReady();
     Game* getGame();
     void setReady(UserClient *);
@@ -36,6 +38,7 @@ public:
     void removeUser(UserClient *);
     
     bool isIngame();
+    void userDisconnectWhileInGame(UserClient *);
 
     void startGame();
     void endGame();

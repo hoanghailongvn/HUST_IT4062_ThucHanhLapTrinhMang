@@ -23,6 +23,7 @@ void UserClient::setWritefd(int writefd) {
 
 void UserClient::setRoom(Room *room) {
     this->room = room;
+    this->user->setRoom(room);
 }
 
 User* UserClient::getUser() {

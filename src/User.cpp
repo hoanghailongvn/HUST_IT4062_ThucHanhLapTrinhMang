@@ -1,4 +1,5 @@
 #include "../include/User.h"
+#include "../include/Room.h"
 
 using namespace std;
 
@@ -23,10 +24,6 @@ bool User::isOnline() {
     return this->state == ONLINE;
 }
 
-bool User::isOffline() {
-    return this->state == OFFLINE;
-}
-
 string User::getUsername() {
     return this->username;
 }
@@ -44,4 +41,8 @@ void User::setInGame(bool input) {
 }
 bool User::isInGame() {
     return this->inGame;
+}
+
+void User::setRoom(Room *room) {
+    this->room = room;
 }
