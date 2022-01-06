@@ -134,6 +134,7 @@ void Room::endGame() {
     }
     
     Server::updateRoom(room);
+    Server::updateLobby();
     delete this->game;
 }
 
@@ -149,4 +150,21 @@ vector<UserClient *> Room::getOnlineClient() {
         }
     }
     return res;
+}
+
+void Room::userReconnectWhileInGame(UserClient *userClient) {
+    UserClient* oldClient;
+
+    for(int i = 0; i < this->listUser.size(); i++) {
+        if (this->listUser.at(i)->getUser() == userClient->getUser()) {
+            oldClient = this->listUser.at(i);
+            this->listUser.at(i) = userClient;
+            break;
+        }
+    }
+
+    this->game->setListUser(this->listUser);
+
+    this->disconnectedClient.erase(remove(this->disconnectedClient.begin(), this->disconnectedClient.end(), oldClient), this->disconnectedClient.end());
+    delete oldClient;
 }

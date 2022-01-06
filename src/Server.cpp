@@ -164,7 +164,9 @@ void Server::rq_register(char *rq_register, char *rp_register)
 
 }
 
-void Server::rq_login(char *rq_login, char *rp_login, int connfd, UserClient *&userClient) {
+void Server::rq_login(char *rq_login, int connfd, UserClient *&userClient) {
+    char send_msg[BUFF_SIZE + 1];
+
     struct rq_login rq = message_to_rq_login(rq_login);
     struct rp_login rp;
 
@@ -201,7 +203,12 @@ void Server::rq_login(char *rq_login, char *rp_login, int connfd, UserClient *&u
 
         Server::updateLobby(userClient);
     }
-    struct_to_message(&rp, RP_LOGIN, rp_login);
+    struct_to_message(&rp, RP_LOGIN, send_msg);
+    Server::sendToClient(connfd, send_msg);
+
+    if (rp.accept && target->isInGame()) {
+        Server::reconnect(userClient, target);
+    }
 }
 
 void Server::rq_logout(char *rq_logout, char *rp_logout, UserClient *&userClient) {
@@ -318,17 +325,20 @@ void Server::rq_start(Room *room) {
 void Server::rq_action(char *rq_action, UserClient *&userClient) {
     struct rq_action rq = message_to_rq_action(rq_action);
     Room *room = userClient->getRoom();
-
     // if target update
     bool check = true;
     if (room->getGame()->receivAction(rq, userClient)) {
         if(room->getGame()->isEndGame()) {
+
             room->endGame();
+
             check = false;
         } else {
             Server::updateTarget(room);
+
         }
     }
+
     if (check){
         Server::updateGame(room);
     }
@@ -478,8 +488,26 @@ void Server::disconnect(UserClient *&userClient) {
     
 }
 
-void Server::afk(UserClient *&userClient) {
-    ///
+void Server::reconnect(UserClient *&userClient, User *user) {
+    Room *room = user->getRoom();
+
+    room->userReconnectWhileInGame(userClient);
+
+    char message[BUFF_SIZE + 1];
+
+    rp_join_room rp_j_r;
+    rp_j_r.accept = true;
+    struct_to_message(&rp_j_r, RP_JOIN_ROOM, message);
+    Server::sendToClient(userClient->getWritefd(), message);
+    userClient->setRoom(room);
+
+    Server::updateRoom(room);
+
+    start s;
+    struct_to_message(&s, START, message);
+    Server::sendToClient(userClient->getWritefd(), message);
+
+    Server::updateGame(room);
 }
 
 void* Server::routine1(void *input) {
@@ -504,8 +532,7 @@ void* Server::routine1(void *input) {
             break;
         
         case RQ_LOGIN:
-            Server::rq_login(rcv_message, send_message, connfd, userClient);
-            Server::sendToClient(connfd, send_message);
+            Server::rq_login(rcv_message, connfd, userClient);
             break;
 
         case RQ_LOGOUT:

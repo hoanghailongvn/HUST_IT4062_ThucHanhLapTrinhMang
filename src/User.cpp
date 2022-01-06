@@ -46,3 +46,7 @@ bool User::isInGame() {
 void User::setRoom(Room *room) {
     this->room = room;
 }
+
+Room* User::getRoom() {
+    return this->room;
+}

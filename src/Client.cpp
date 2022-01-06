@@ -583,6 +583,15 @@ UserClient* Client::getUserClient() {
     return this->userClient;
 }
 
+void getmessage(vector<string> *input, MessageType type, char *msg_out) {
+    string temp = "";
+    for(int i = 0; i < msg_length.at(type); i++) {
+        temp += input->at(i) + "\n";
+    }
+    strcpy(msg_out, temp.c_str());
+    input->erase(input->begin(), input->begin() + msg_length.at(type));
+}
+
 bool Client::msg_handle(char *message) {
     auto splited_line = split(message, "\n");
 
@@ -590,57 +599,41 @@ bool Client::msg_handle(char *message) {
         return false;
     }
 
-    string temp;
     char c_temp[BUFF_SIZE + 1];
 
     while(splited_line.size() > 1) {
-        temp = "";
         switch (stoi(splited_line.at(0)))
         {
             case UPDATE_LOBBY:
-                for(int i = 0; i < msg_length.at(UPDATE_LOBBY); i++) {
-                    temp += splited_line.at(i) + "\n";
-                }
-                strcpy(c_temp, temp.c_str());
+                getmessage(&splited_line, UPDATE_LOBBY, c_temp);
                 this->rp_update_lobby(c_temp);
-                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_LOBBY));
                 break;
             case UPDATE_ROOM:
-                for(int i = 0; i < msg_length.at(UPDATE_ROOM); i++) {
-                    temp += splited_line.at(i) + "\n";
-                }
-                strcpy(c_temp, temp.c_str());
+                getmessage(&splited_line, UPDATE_ROOM, c_temp);
                 this->rp_update_room(c_temp);
-                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_ROOM));
                 break;
             case START:
                 this->rp_start_game();
                 splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(START));
                 break;
             case UPDATE_GAME:
-                for(int i = 0; i < msg_length.at(UPDATE_GAME); i++) {
-                    temp += splited_line.at(i) + "\n";
-                }
-                strcpy(c_temp, temp.c_str());
+                getmessage(&splited_line, UPDATE_GAME, c_temp);
                 this->rp_update_game(c_temp);
-                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_GAME));
                 break;
             case UPDATE_TARGET:
-                for(int i = 0; i < msg_length.at(UPDATE_TARGET); i++) {
-                    temp += splited_line.at(i) + "\n";
-                }
-                strcpy(c_temp, temp.c_str());
+                getmessage(&splited_line, UPDATE_TARGET, c_temp);
                 this->rp_update_target(c_temp);
-                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(UPDATE_TARGET));
                 break;
             case END_GAME:
-                for(int i = 0; i < msg_length.at(END_GAME); i++) {
-                    temp += splited_line.at(i) + "\n";
-                }
-                strcpy(c_temp, temp.c_str());
+                getmessage(&splited_line, END_GAME, c_temp);
                 this->rp_end_game(c_temp);
-                splited_line.erase(splited_line.begin(), splited_line.begin() + msg_length.at(END_GAME));
                 break;
+
+            case RP_JOIN_ROOM:
+                getmessage(&splited_line, RP_JOIN_ROOM, c_temp);
+                this->rp_joinRoom(c_temp);
+                break;
+        
             default:
                 break;
         }

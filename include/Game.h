@@ -28,6 +28,8 @@ public:
 
     const bool getEndGame() const;
 
+    void setListUser(std::vector<UserClient *> input);
+
     std::vector<int> getX();
     std::vector<int> getY();
     std::vector<int> getPoint();

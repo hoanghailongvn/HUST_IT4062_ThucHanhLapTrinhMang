@@ -39,7 +39,7 @@ public:
     void run();
 
     static void rq_register(char *rq_register, char *rp_register);
-    static void rq_login(char *rq_login, char *rp_login, int connfd, UserClient *&userClient);
+    static void rq_login(char *rq_login, int connfd, UserClient *&userClient);
     static void rq_logout(char *rq_logout, char *rp_logout, UserClient *&userClient);
     static void rq_createRoom(char *rq_createRoom, char *rp_createRoom, UserClient *&userClient);
     static void rq_exitRoom(UserClient *&userClient);
@@ -48,7 +48,7 @@ public:
     static void rq_start(Room *room);
     static void rq_action(char *rq_action, UserClient *&userClient);
     static void disconnect(UserClient *&userClient);
-    static void afk(UserClient *&userClient);
+    static void reconnect(UserClient *&userClient, User *user);
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);

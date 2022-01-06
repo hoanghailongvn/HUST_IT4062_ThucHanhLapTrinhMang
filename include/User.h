@@ -26,6 +26,7 @@ public:
     State getState();
     void setInGame(bool);
     void setRoom(Room *room);
+    Room* getRoom();
     bool isInGame();
     
 };

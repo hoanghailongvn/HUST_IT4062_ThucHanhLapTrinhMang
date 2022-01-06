@@ -36,9 +36,10 @@ public:
     
     void addUser(UserClient *);
     void removeUser(UserClient *);
-    
+
     bool isIngame();
     void userDisconnectWhileInGame(UserClient *);
+    void userReconnectWhileInGame(UserClient *);
 
     void startGame();
     void endGame();
