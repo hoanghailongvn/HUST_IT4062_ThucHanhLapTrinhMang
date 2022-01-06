@@ -29,6 +29,7 @@ public:
 
     void update(sf::Vector2f mousePos);
     void drawTo(sf::RenderTarget& target);
+    void setColor(sf::Color );
 
     //Accessors
     const bool isPressed() const;

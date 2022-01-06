@@ -67,3 +67,7 @@ const bool Button::isPressed() const {
         return false;
     }
 }
+
+void Button::setColor(sf::Color color) {
+    this->shape.setFillColor(color);
+}

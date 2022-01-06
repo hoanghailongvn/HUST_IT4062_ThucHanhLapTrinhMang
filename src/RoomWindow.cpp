@@ -63,8 +63,12 @@ void RoomWindow::setName(string name) {
 void RoomWindow::update(sf::Vector2f mousePos) {
     this->back_btn->update(mousePos);
     if (this->isHost) {
-        if (this->startable())
-            this->start_btn->update(mousePos);   
+        if (this->startable()) {
+            this->start_btn->update(mousePos);  
+        } else {
+            this->start_btn->setColor(sf::Color::Black);
+        }
+             
     } else {
         this->ready_btn->update(mousePos);
     }

@@ -304,6 +304,7 @@ void Client::pollEvents()
 
                 break;
             }
+            break;
         case GAME:
             switch (ev.type)
             {
@@ -315,6 +316,7 @@ void Client::pollEvents()
             default:
                 break;
             }
+            break;
         default:
             break;
         }
