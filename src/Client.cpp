@@ -569,11 +569,10 @@ void * Client::routine2(void *c) {
 
     char rcv_message[BUFF_SIZE + 1], send_message[BUFF_SIZE + 1];
     
-    while (true) {
+    do {
         client->rcvFromServer(connfd, rcv_message);
-        client->msg_handle(rcv_message);
-    }
-    close(connfd);
+
+    } while(client->msg_handle(rcv_message));
 
     return nullptr;
 }
@@ -582,8 +581,12 @@ UserClient* Client::getUserClient() {
     return this->userClient;
 }
 
-void Client::msg_handle(char *message) {
+bool Client::msg_handle(char *message) {
     auto splited_line = split(message, "\n");
+
+    if(splited_line.size() == 1 && splited_line.at(0).length() == 0) {
+        return false;
+    }
 
     string temp;
     char c_temp[BUFF_SIZE + 1];
@@ -640,5 +643,5 @@ void Client::msg_handle(char *message) {
                 break;
         }
     }
-
+    return true;
 }

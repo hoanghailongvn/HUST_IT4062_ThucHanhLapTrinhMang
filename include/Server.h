@@ -48,6 +48,7 @@ public:
     static void rq_start(Room *room);
     static void rq_action(char *rq_action, UserClient *&userClient);
     static void disconnect(UserClient *&userClient);
+    static void afk(UserClient *&userClient);
 
     static struct update_lobby to_struct_update_lobby();
     static struct update_room to_struct_update_room(Room *&room);

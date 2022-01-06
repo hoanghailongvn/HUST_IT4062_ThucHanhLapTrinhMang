@@ -312,21 +312,26 @@ void Server::rq_start(Room *room) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
     Server::updateTarget(room);
-
     Server::updateLobby();
 }
 
 void Server::rq_action(char *rq_action, UserClient *&userClient) {
     struct rq_action rq = message_to_rq_action(rq_action);
     Room *room = userClient->getRoom();
+
+    // if target update
+    bool check = true;
     if (room->getGame()->receivAction(rq, userClient)) {
         if(room->getGame()->isEndGame()) {
             Server::endGame(room);
+            check = false;
         } else {
             Server::updateTarget(room);
         }
     }
-    Server::updateGame(room);
+    if (check){
+        Server::updateGame(room);
+    }
 }
 
 struct update_lobby Server::to_struct_update_lobby() {
@@ -338,6 +343,7 @@ struct update_lobby Server::to_struct_update_lobby() {
     }
     return res;
 }
+
 struct update_room Server::to_struct_update_room(Room *&room) {
     struct update_room res;
     res.room_name = room->getName();
@@ -438,7 +444,8 @@ void Server::endGame(Room *&room) {
     for (auto client:room->getListUser()) {
         Server::sendToClient(client->getWritefd(), send_msg);
     }
-    room->setInGame(false);
+
+    room->endGame();
     room->resetReady();
     Server::updateRoom(room);
 }
@@ -481,6 +488,10 @@ void Server::disconnect(UserClient *&userClient) {
         Server::updateLobby();
     }
     delete userClient;
+}
+
+void Server::afk(UserClient *&userClient) {
+    ///
 }
 
 void* Server::routine1(void *input) {

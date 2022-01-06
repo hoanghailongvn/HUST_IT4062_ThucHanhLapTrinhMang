@@ -4,6 +4,7 @@ using namespace std;
 
 User::User(string username, string password) {
     this->state = OFFLINE;
+    this->inGame = false;
     this->username = username;
     this->password = password;
 }
@@ -19,7 +20,7 @@ State User::getState() {
 }
 
 bool User::isOnline() {
-    return this->state == ONLINE || this->state == INGAME;
+    return this->state == ONLINE;
 }
 
 bool User::isOffline() {
@@ -36,4 +37,11 @@ bool User::checkPassword(string input) {
     } else {
         return false;
     }
+}
+
+void User::setInGame(bool input) {
+    this->inGame = input;
+}
+bool User::isInGame() {
+    return this->inGame;
 }

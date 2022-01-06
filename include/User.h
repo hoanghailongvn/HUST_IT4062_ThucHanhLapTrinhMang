@@ -4,13 +4,14 @@
 #include <string>
 #include "GameConfig.h"
 
-enum State {OFFLINE, ONLINE, INGAME};
+enum State {OFFLINE, ONLINE};
 
 class User {
 private:
     State state;
     std::string username;
     std::string password;
+    bool inGame;
 public:
     User(std::string username, std::string password);
     ~User();
@@ -21,6 +22,8 @@ public:
     bool isOffline();
     void setState(State state);
     State getState();
+    void setInGame(bool);
+    bool isInGame();
 };
 
 #endif

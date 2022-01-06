@@ -3,7 +3,7 @@
 using namespace std;
 
 std::vector<int> msg_length
-{1, //RQ_EXIT
+{1,//RQ_EXIT
 3, 3, //RQ_REGISTER, RP_REGISTER
 3, 4,//RQ_LOGIN, RP_LOGIN
 1, 3,//RQ_LOGOUT, RP_LOGOUT
@@ -346,10 +346,7 @@ void struct_to_message(void *p, MessageType type, char *output) {
 
 rq_register message_to_rq_register(char *message) {
     auto splited_line = split(message, "\n");
-    if (splited_line.size() != 3) {
-        cout << "message_to_rq_register error!!\n";
-        exit(1);
-    }
+
     rq_register res;
     res.type = RQ_REGISTER;
     res.username = splited_line.at(1);

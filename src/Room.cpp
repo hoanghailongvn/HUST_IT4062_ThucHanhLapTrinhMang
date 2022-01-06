@@ -93,12 +93,19 @@ UserClient* Room::getHost() {
 bool Room::isIngame() {
     return this->ingame;
 }
-void Room::setInGame(bool input) {
-    this->ingame = input;
-}
 
 void Room::startGame() {
     this->game = new Game(this->listUser);
     this->ingame = true;
+    for(auto client: this->listUser) {
+        client->getUser()->setInGame(true);
+    }
+}
 
+void Room::endGame() {
+    this->ingame = false;
+    for(auto client: this->listUser) {
+        client->getUser()->setInGame(false);
+    }
+    delete this->game;
 }

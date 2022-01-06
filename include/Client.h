@@ -119,7 +119,7 @@ public:
     void rp_start_game();
     void rp_end_game(char *message);
 
-    void msg_handle(char *message);
+    bool msg_handle(char *message);
 
     static void* routine1(void *);
     static void* routine2(void *); 
