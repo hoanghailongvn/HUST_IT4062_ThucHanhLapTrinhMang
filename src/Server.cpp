@@ -206,6 +206,8 @@ void Server::rq_login(char *rq_login, int connfd, UserClient *&userClient) {
     struct_to_message(&rp, RP_LOGIN, send_msg);
     Server::sendToClient(connfd, send_msg);
 
+    sleep(1);
+
     if (rp.accept && target->isInGame()) {
         Server::reconnect(userClient, target);
     }
