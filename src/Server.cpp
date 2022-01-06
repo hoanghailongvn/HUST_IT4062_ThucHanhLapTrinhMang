@@ -508,6 +508,7 @@ void Server::reconnect(UserClient *&userClient, User *user) {
     Server::sendToClient(userClient->getWritefd(), message);
 
     Server::updateGame(room);
+    Server::updateTarget(room);
 }
 
 void* Server::routine1(void *input) {

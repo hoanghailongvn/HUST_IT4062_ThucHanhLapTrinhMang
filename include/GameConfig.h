@@ -16,7 +16,7 @@
 #define BUFF_SIZE 1024
 #define SERVER_PORT 8080
 #define MAX_ROOM 4
-#define GAME_LENGTH 60
-#define MAX_POINT 3
+#define GAME_LENGTH 999
+#define MAX_POINT 2
 
 #endif

@@ -65,9 +65,7 @@ bool Game::isEndGame() {
 bool Game::receivAction(struct rq_action rq, UserClient *&userClient) {
     int position = -1;
     for(int i = 0; i < this->listUser.size(); i++) {
-        cout << "ok" << i << endl;
         if (this->listUser.at(i) == userClient) {
-            cout << "slkdjf" << endl;
             position = i;
         }
     }
