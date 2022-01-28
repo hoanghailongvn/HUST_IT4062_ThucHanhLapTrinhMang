@@ -4,10 +4,10 @@ Kì học: 20211\
 Lớp: 126819\
 6 08:25-11:45
 
-sfml: interface
-c++: sfml
-c: socket library
+sfml: interface\
+c++: sfml\
+c: socket library\
 
-make
+make\
 ./bin/server
 ./bin/client
