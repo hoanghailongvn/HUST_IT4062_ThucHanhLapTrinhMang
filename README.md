@@ -6,7 +6,7 @@ Lớp: 126819\
 
 sfml: interface\
 c++: sfml\
-c: socket library\
+c: socket library
 
 make\
 ./bin/server
